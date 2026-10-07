@@ -2,7 +2,7 @@ using SudokuGen.Tui;
 
 namespace SudokuGen.Tests;
 
-internal sealed class RecordingCanvas(int width = 80, int height = 24) : ICanvas
+internal sealed class RecordingCanvas(int width = 80, int height = 30) : ICanvas
 {
     private readonly char[,] chars = new char[width, height];
     private readonly Style[,] styles = new Style[width, height];
@@ -13,10 +13,16 @@ internal sealed class RecordingCanvas(int width = 80, int height = 24) : ICanvas
 
     public void Put(int x, int y, string text, Style style)
     {
-        for (var i = 0; i < text.Length; i++)
+        var column = x;
+        foreach (var c in text)
         {
-            chars[x + i, y] = text[i];
-            styles[x + i, y] = style;
+            chars[column, y] = c;
+            styles[column, y] = style;
+            column++;
+            if (c is >= '\uFF01' and <= '\uFF60')
+            {
+                styles[column++, y] = style;
+            }
         }
     }
 
@@ -43,6 +49,19 @@ internal sealed class RecordingCanvas(int width = 80, int height = 24) : ICanvas
     public bool Contains(string text) => All().Contains(text, StringComparison.Ordinal);
 }
 
+internal sealed class FakeSystem : ISystem
+{
+    public string? Clipboard { get; set; }
+
+    public List<string> Opened { get; } = [];
+
+    public string? ReadClipboard() => Clipboard;
+
+    public void WriteClipboard(string text) => Clipboard = text;
+
+    public void OpenUrl(string url) => Opened.Add(url);
+}
+
 internal sealed class UiFixture : IDisposable
 {
     private readonly TempDirectory dir = new();
@@ -55,10 +74,12 @@ internal sealed class UiFixture : IDisposable
             Session.TryStart(id, Difficulty.Hard, out _);
         }
 
-        Ui = new Ui(Session, Clock);
+        Ui = new Ui(Session, Clock, System);
     }
 
     public ManualClock Clock { get; } = new();
+
+    public FakeSystem System { get; } = new();
 
     public Session Session { get; }
 
@@ -66,7 +87,7 @@ internal sealed class UiFixture : IDisposable
 
     public Game Game => Session.Game!;
 
-    public RecordingCanvas Paint(int width = 80, int height = 24)
+    public RecordingCanvas Paint(int width = 80, int height = 30)
     {
         var canvas = new RecordingCanvas(width, height);
         Ui.Paint(canvas);
@@ -83,7 +104,7 @@ internal sealed class UiFixture : IDisposable
         }
     }
 
-    public void Click(int x, int y) => Ui.HandleClick(x, y, 80, 24);
+    public void Click(int x, int y) => Ui.HandleClick(x, y, 80, 30);
 
     public void ClickLabel(string label)
     {
@@ -91,8 +112,8 @@ internal sealed class UiFixture : IDisposable
         Click(x + 1, y);
     }
 
-    /// <summary>Top-left of a cell on an 80x24 screen.</summary>
-    public static (int X, int Y) CellAt(int row, int column) => (6 + (column * 5) + (column / 3), 1 + (row * 2) + (row / 3));
+    /// <summary>Top-left of a cell on an 80x30 screen.</summary>
+    public static (int X, int Y) CellAt(int row, int column) => ((column * 6) + (column / 3), (row * 3) + (row / 3));
 
     public void ClickCell(int cell)
     {

@@ -7,12 +7,15 @@ A rich terminal Sudoku game as a **Playground** that consumes the library. Vocab
 - `src/samples/SudokuGen.Tui`, added to `src/SudokuGen.slnx`.
 - Terminal.Gui v2 (package added to `src/Directory.Packages.props`).
 - Windows Terminal is the target. Keyboard and mouse both work fully.
-- Below the minimum size (70x24) a "please enlarge" message replaces the board.
+- Below the minimum size (80x30) a "please enlarge" message replaces the board.
 
 ## Play
 
 - Select a cell by mouse click or arrow keys.
-- Digits 1-9 enter, Backspace/Delete/0 clear. A clickable number pad does the same.
+- Digits 1-9 enter, Backspace/Delete/0 clear. A clickable number pad does the same; a digit whose nine cells are all placed without a conflict turns gray on the pad.
+- Digits are drawn as large (fullwidth) glyphs centered in 6x3 cells.
+- The Sudoku id can be copied (Ctrl+C, the Copy button, or C / Copy id on the win dialog). Pasting into the id field of the start screen works with the terminal paste and Ctrl+V.
+- A footer credits kw.dev and links to the site and to the license (clicking opens the browser). The brand color #d06900 is used for headers and the company name only, never for conflicts or errors.
 - Undo/redo with Ctrl+Z / Ctrl+Y. History holds only cell changes.
 - **Givens** are locked.
 - No notes. No automatic hints except the visual cues below.
@@ -62,6 +65,7 @@ Directory `%LOCALAPPDATA%\SudokuGen\`, injected into the code so tests use a tem
 Per difficulty (easy, medium, hard, expert):
 
 - Games started, games won, win rate (derived), fastest time, average time (over won games), current win streak, best win streak.
+- A Total line sums games, wins and win rate over all difficulties (times and streaks do not add up).
 
 Rules:
 

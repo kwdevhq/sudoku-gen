@@ -63,4 +63,4 @@ Contributors and AI agents: see [AGENTS.md](AGENTS.md) and [GLOSSARY.md](GLOSSAR
 
 ## License
 
-MIT. Copyright (c) Pete Williams and kwdevhq. See [LICENSE](LICENSE).
+MIT. The core is derived from the original by Pete Williams; the port, its extensions and everything else is by [kw.dev GmbH](https://kw.dev). See [LICENSE](LICENSE).

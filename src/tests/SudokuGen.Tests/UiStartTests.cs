@@ -190,7 +190,7 @@ public class UiStartTests
         var screen = f.Paint(60, 20);
         f.Ui.HandleClick(10, 10, 60, 20);
 
-        await Assert.That(screen.Contains("Please enlarge the terminal to at least 70x24.")).IsTrue();
+        await Assert.That(screen.Contains("Please enlarge the terminal to at least 80x30.")).IsTrue();
         await Assert.That(f.Ui.Screen).IsEqualTo(Screen.Start);
     }
 }

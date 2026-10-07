@@ -63,17 +63,17 @@ public class UiPlayingTests
         var cell = TuiHelpers.FirstEmpty(f.Game);
         f.Game.Select(cell);
         f.Key(TuiHelpers.Wrong(f.Game, cell).ToString());
-        await Assert.That(f.Paint().Contains("Check:")).IsFalse();
+        await Assert.That(f.Paint().Contains(" wrong,")).IsFalse();
         await Assert.That(f.Game.MarkAt(cell)).IsEqualTo(CellMark.None);
 
         f.Key("c");
 
         var empty = Enumerable.Range(0, Game.CellCount).Count(i => !f.Game.IsGiven(i)) - 1;
-        await Assert.That(f.Paint().Contains($"Check: 1 wrong, {empty} empty")).IsTrue();
+        await Assert.That(f.Paint().Contains($"1 wrong, {empty} empty")).IsTrue();
         await Assert.That(f.Game.MarkAt(cell)).IsEqualTo(CellMark.Wrong);
 
         f.Key("0");
-        await Assert.That(f.Paint().Contains("Check:")).IsFalse();
+        await Assert.That(f.Paint().Contains(" wrong,")).IsFalse();
     }
 
     [Test]
@@ -158,7 +158,7 @@ public class UiPlayingTests
         f.ClickCell(cell);
         await Assert.That(f.Game.Selected).IsEqualTo(cell);
 
-        f.Click(63, 7);
+        f.Click(66, 7);
         await Assert.That(f.Game[cell]).IsEqualTo('5');
 
         f.ClickLabel("Undo");
@@ -169,11 +169,11 @@ public class UiPlayingTests
         await Assert.That(f.Game[cell]).IsEqualTo(Game.Empty);
 
         f.ClickLabel("Undo");
-        f.Click(0, 23);
+        f.Click(79, 29);
         await Assert.That(f.Game[cell]).IsEqualTo('5');
 
         f.ClickLabel("Check");
-        await Assert.That(f.Paint().Contains("Check: ")).IsTrue();
+        await Assert.That(f.Paint().Contains(" wrong, ")).IsTrue();
         f.ClickLabel("Reset");
         await Assert.That(f.Ui.Screen).IsEqualTo(Screen.Confirm);
         f.ClickLabel("No (N)");
@@ -214,9 +214,9 @@ public class UiPlayingTests
         using var f = new UiFixture();
         var before = f.Game.Selected;
 
-        f.Click(0, 0);
-        f.Click(10, 22);
-        f.Click(8 + 4 * 5 + 1, 0);
+        f.Click(56, 10);
+        f.Click(79, 29);
+        f.Click(57, 0);
 
         await Assert.That(f.Game.Selected).IsEqualTo(before);
     }
@@ -228,7 +228,7 @@ public class UiPlayingTests
         var cell = TuiHelpers.FirstEmpty(f.Game);
         f.Game.Select(cell);
 
-        f.Ui.HandleClick(63, 7, 60, 20);
+        f.Ui.HandleClick(66, 7, 60, 20);
         await Assert.That(f.Ui.Tick()).IsTrue();
 
         f.Key("5");

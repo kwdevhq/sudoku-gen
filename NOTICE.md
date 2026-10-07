@@ -11,4 +11,7 @@ What was carried over from the original project:
 
 The original TypeScript sources remain available in this repository's git history
 (commits before the .NET port). The original MIT license text and copyright notice are
-retained in [LICENSE](LICENSE) together with the copyright of this repository's maintainers.
+retained in [LICENSE](LICENSE) together with the copyright of kw.dev GmbH.
+
+The core algorithm and seed data originate from Pete Williams. The .NET port, its extensions (solver, samples,
+tests, benchmarks) and everything else in this repository are Copyright (c) 2026 kw.dev GmbH ([kw.dev](https://kw.dev)).

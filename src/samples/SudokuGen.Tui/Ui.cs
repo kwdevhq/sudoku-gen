@@ -27,10 +27,10 @@ internal enum PendingAction
 /// The whole user interface minus the terminal: which screen is shown, what keys and clicks do, and what gets painted.
 /// The Terminal.Gui view only forwards input and supplies an <see cref="ICanvas"/>.
 /// </summary>
-internal sealed partial class Ui(Session session, TimeProvider clock)
+internal sealed partial class Ui(Session session, TimeProvider clock, ISystem system)
 {
-    public const int MinWidth = 70;
-    public const int MinHeight = 24;
+    public const int MinWidth = 80;
+    public const int MinHeight = 30;
     private const int MaxIdLength = 14;
 
     private static readonly TimeSpan WaveDuration = TimeSpan.FromSeconds(1);
@@ -136,6 +136,9 @@ internal sealed partial class Ui(Session session, TimeProvider clock)
             case { Key: "y", Ctrl: true }:
                 Edited(session.Redo());
                 break;
+            case { Key: "c", Ctrl: true }:
+                CopyId();
+                break;
             case { Key: "c" }:
                 Check();
                 break;
@@ -169,10 +172,16 @@ internal sealed partial class Ui(Session session, TimeProvider clock)
         }
     }
 
+    private void CopyId()
+    {
+        system.WriteClipboard(session.Game!.Sudoku.Id.ToString());
+        status = "Id copied.";
+    }
+
     private void Check()
     {
         var result = session.Game!.Check();
-        status = $"Check: {result.Wrong} wrong, {result.Empty} empty";
+        status = $"{result.Wrong} wrong, {result.Empty} empty";
     }
 
     private void RequestReset()
@@ -251,6 +260,9 @@ internal sealed partial class Ui(Session session, TimeProvider clock)
             case "n" or "Enter":
                 GoToStart();
                 break;
+            case "c":
+                CopyId();
+                break;
             case "q" or "Esc":
                 Quit();
                 break;
@@ -284,14 +296,32 @@ internal sealed partial class Ui(Session session, TimeProvider clock)
             case "Esc":
                 LeaveStart();
                 break;
+            case "v" when input.Ctrl:
+                Paste(system.ReadClipboard());
+                break;
             case "Backspace" when focus == StartFocus.Id:
                 idText = idText.Length > 0 ? idText[..^1] : idText;
                 break;
-            case [var c] when focus == StartFocus.Id && (char.IsAsciiLetterOrDigit(c) || c == '-') && idText.Length < MaxIdLength:
+            case [var c] when focus == StartFocus.Id && !input.Ctrl && IsIdChar(c) && idText.Length < MaxIdLength:
                 idText += char.ToUpperInvariant(c);
                 break;
         }
     }
+
+    /// <summary>Pasted text goes into the id field of the start screen; anything that cannot be part of an id is dropped.</summary>
+    public void Paste(string? text)
+    {
+        if (Screen != Screen.Start)
+        {
+            return;
+        }
+
+        focus = StartFocus.Id;
+        var clean = new string((text ?? string.Empty).Where(IsIdChar).Select(char.ToUpperInvariant).ToArray());
+        idText = (idText + clean)[..Math.Min(MaxIdLength, idText.Length + clean.Length)];
+    }
+
+    private static bool IsIdChar(char c) => char.IsAsciiLetterOrDigit(c) || c == '-';
 
     private void LeaveStart()
     {

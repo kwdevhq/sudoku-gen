@@ -4,7 +4,7 @@
     <RootNamespace>SudokuGen</RootNamespace>
     <PackageId>SudokuGen</PackageId>
     <Version>0.1.0</Version>
-    <Authors>kwdevhq, Pete Williams</Authors>
+    <Authors>kw.dev GmbH, Pete Williams</Authors>
     <Description>A fast sudoku puzzle generator. .NET port of petewritescode/sudoku-gen: transforms known seed puzzles into new ones.</Description>
     <PackageTags>sudoku;puzzle;generator</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

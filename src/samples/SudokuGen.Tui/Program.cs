@@ -9,10 +9,9 @@ internal static class TuiApp
     {
         var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SudokuGen");
         var session = new Session(directory, TimeProvider.System);
-        var ui = new Ui(session, TimeProvider.System);
-
         using var app = Application.Create();
         app.Init();
+        var ui = new Ui(session, TimeProvider.System, new TerminalSystem(app));
         using var host = new TerminalHost(app, ui);
         app.AddTimeout(TimeSpan.FromMilliseconds(100), () =>
         {

@@ -26,6 +26,10 @@ internal sealed record Statistics([property: JsonRequired] int Version, [propert
     [JsonIgnore]
     public bool IsValid => Version == CurrentVersion && ByDifficulty.Count == DifficultyCount;
 
+    /// <summary>Games and wins over all difficulties; times and streaks do not add up across difficulties and stay empty.</summary>
+    [JsonIgnore]
+    public DifficultyStats Total => new(ByDifficulty.Sum(s => s.Started), ByDifficulty.Sum(s => s.Won), null, 0, 0, 0);
+
     public DifficultyStats this[Difficulty difficulty] => ByDifficulty[(int)difficulty];
 
     public Statistics Started(Difficulty difficulty) => Update(difficulty, s => s with { Started = s.Started + 1 });

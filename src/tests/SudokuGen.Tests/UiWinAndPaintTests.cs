@@ -185,7 +185,7 @@ public class UiWinAndPaintTests
         await Assert.That(Bg(unrelated)).IsNotEqualTo(Theme.UnitHighlight);
 
         var (gx, gy) = UiFixture.CellAt(given / 9, given % 9);
-        await Assert.That(screen.Row(gy).Substring(gx, 5).Trim()).IsEqualTo($"[{game[given]}]");
+        await Assert.That(screen.Row(gy + 1).Substring(gx, 6).Trim()).IsEqualTo($"[{(char)('\uFF10' + (game[given] - '0'))} ]");
     }
 
     [Test]

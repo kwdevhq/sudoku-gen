@@ -76,6 +76,9 @@ internal sealed class Game
     public bool HasConflict(int cell) =>
         cells[cell] != Empty && Enumerable.Range(0, CellCount).Any(other => other != cell && cells[other] == cells[cell] && SharesUnit(cell, other));
 
+    /// <summary>All nine of the digit are placed and none of them is in conflict.</summary>
+    public bool IsDigitComplete(char digit) => Enumerable.Range(0, CellCount).Count(i => cells[i] == digit && !HasConflict(i)) == Size;
+
     public static bool SharesUnit(int a, int b) =>
         a / Size == b / Size || a % Size == b % Size || (a / Size / 3 == b / Size / 3 && a % Size / 3 == b % Size / 3);
 

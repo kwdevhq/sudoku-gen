@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
@@ -50,6 +51,13 @@ internal sealed class TerminalHost : Runnable
         }
 
         return base.OnKeyDown(key);
+    }
+
+    protected override bool OnPaste(string text)
+    {
+        ui.Paste(text);
+        Refresh();
+        return true;
     }
 
     protected override bool OnMouseEvent(Mouse mouse)
@@ -108,5 +116,25 @@ internal sealed class TerminalHost : Runnable
         }
 
         private static Color ToColor(Rgb rgb) => new(rgb.R, rgb.G, rgb.B);
+    }
+}
+
+/// <summary>Clipboard and browser access for <see cref="Ui"/>; best effort, a failure never interrupts the game.</summary>
+[ExcludeFromCodeCoverage(Justification = "Talks to the operating system (ADR 0005).")]
+internal sealed class TerminalSystem(IApplication app) : ISystem
+{
+    public string? ReadClipboard() => app.Clipboard is { } clipboard && clipboard.TryGetClipboardData(out var text) ? text : null;
+
+    public void WriteClipboard(string text) => app.Clipboard?.TrySetClipboardData(text);
+
+    public void OpenUrl(string url)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+        }
     }
 }

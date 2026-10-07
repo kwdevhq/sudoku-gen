@@ -2,21 +2,23 @@ namespace SudokuGen.Tui;
 
 internal sealed partial class Ui
 {
-    private const int BoardWidth = 47;
-    private const int BoardHeight = 20;
-    private const int PanelGap = 3;
-    private const int PanelWidth = 17;
+    private const int BoardWidth = 56;
+    private const int PanelGap = 2;
+    private const int PanelWidth = 22;
     private const int TotalWidth = BoardWidth + PanelGap + PanelWidth;
-    private const int CellWidth = 5;
-    private const int CellHeight = 2;
+    private const int CellWidth = 6;
+    private const int CellHeight = 3;
+    private const string LicenseUrl = "https://github.com/kwdevhq/sudoku-gen/blob/main/LICENSE";
+    private const string CompanyUrl = "https://kw.dev";
     private const int ConfirmWidth = 52;
     private const int ConfirmHeight = 7;
     private const int WonWidth = 56;
-    private const int WonHeight = 15;
+    private const int WonHeight = 16;
     private const int StatsWidth = 56;
-    private const int StatsHeight = 10;
+    private const int StatsHeight = 11;
     private const int StartWidth = 40;
     private const int StartHeight = 16;
+    private const int FooterWidth = 31;
 
     private bool Fits => width >= MinWidth && height >= MinHeight;
 
@@ -70,7 +72,7 @@ internal sealed partial class Ui
     {
         var row = cell / Game.Size;
         var column = cell % Game.Size;
-        return (OriginX + (column * CellWidth) + (column / 3), OriginY + 1 + (row * CellHeight) + (row / 3));
+        return (OriginX + (column * CellWidth) + (column / 3), OriginY + (row * CellHeight) + (row / 3));
     }
 
     private int? CellAt(int x, int y)
@@ -112,31 +114,53 @@ internal sealed partial class Ui
         return Screen == Screen.Won ? WonButtons() : [];
     }
 
+    private int PanelX => OriginX + BoardWidth + PanelGap;
+
     private List<Button> PlayingButtons()
     {
         var game = session.Game!;
-        var px = OriginX + BoardWidth + PanelGap;
-        var py = OriginY + 1;
+        var px = PanelX;
+        var py = OriginY;
         var buttons = new List<Button>();
         for (var digit = 1; digit <= 9; digit++)
         {
             var d = (char)('0' + digit);
-            buttons.Add(new Button(px + (((digit - 1) % 3) * 6), py + 4 + (((digit - 1) / 3) * 2), CellWidth, Format.Center(d.ToString(), CellWidth), Theme.ButtonStyle, () => Enter(d)));
+            var style = game.IsDigitComplete(d) ? Theme.ButtonDone : Theme.ButtonStyle;
+            buttons.Add(new Button(px + (((digit - 1) % 3) * 7), py + 5 + (((digit - 1) / 3) * 2), CellWidth, Format.Center(d.ToString(), CellWidth), style, () => Enter(d)));
         }
 
-        buttons.Add(new Button(px, py + 10, PanelWidth, Format.Center("Erase", PanelWidth), Theme.ButtonStyle, () => Enter(Game.Empty)));
-        buttons.Add(Small(px, py + 12, "Check", Check));
-        buttons.Add(Small(px + 9, py + 12, "Undo", game.CanUndo ? () => Edited(session.Undo()) : null));
-        buttons.Add(Small(px, py + 14, "Redo", game.CanRedo ? () => Edited(session.Redo()) : null));
-        buttons.Add(Small(px + 9, py + 14, "Reset", RequestReset));
-        buttons.Add(Small(px, py + 16, "New", RequestNewGame));
-        buttons.Add(Small(px + 9, py + 16, "Quit", Quit));
+        buttons.Add(new Button(px + 17, py + 3, 5, "Copy", Theme.ButtonStyle, CopyId));
+        buttons.Add(new Button(px, py + 11, PanelWidth, Format.Center("Erase", PanelWidth), Theme.ButtonStyle, () => Enter(Game.Empty)));
+        buttons.Add(Small(px, py + 13, "Check", Check));
+        buttons.Add(Small(px + 12, py + 13, "Undo", game.CanUndo ? () => Edited(session.Undo()) : null));
+        buttons.Add(Small(px, py + 15, "Redo", game.CanRedo ? () => Edited(session.Redo()) : null));
+        buttons.Add(Small(px + 12, py + 15, "Reset", RequestReset));
+        buttons.Add(Small(px, py + 17, "New", RequestNewGame));
+        buttons.Add(Small(px + 12, py + 17, "Quit", Quit));
+        buttons.AddRange(FooterButtons(OriginX));
         return buttons;
     }
 
     private static Button Small(int x, int y, string label, Action? click) =>
-        new(x, y, 8, Format.Center(label, 8), click is null ? Theme.ButtonOff : Theme.ButtonStyle, click);
+        new(x, y, 10, Format.Center(label, 10), click is null ? Theme.ButtonOff : Theme.ButtonStyle, click);
 
+    private List<Button> FooterButtons(int x)
+    {
+        var y = OriginY + MinHeight - 1;
+        return
+        [
+            new Button(x + 11, y, 6, "kw.dev", Theme.Company, () => system.OpenUrl(CompanyUrl)),
+            new Button(x + 20, y, 11, "MIT License", Theme.Muted, () => system.OpenUrl(LicenseUrl)),
+        ];
+    }
+
+    private void PaintFooter(ICanvas canvas, int x)
+    {
+        var y = OriginY + MinHeight - 1;
+        Text(canvas, x, y, "Created by", Theme.Muted);
+        Text(canvas, x + 17, y, " · ", Theme.Muted);
+        PaintButtons(canvas, FooterButtons(x));
+    }
     private List<Button> StartButtons()
     {
         var sx = (width - StartWidth) / 2;
@@ -153,6 +177,7 @@ internal sealed partial class Ui
         buttons.Add(new Button(sx + 8, sy + 9, 24, " " + idText + (focus == StartFocus.Id ? "▏" : string.Empty), idStyle, () => focus = StartFocus.Id));
         buttons.Add(new Button(sx + 4, sy + 13, 14, Format.Center("Start", 14), focus == StartFocus.Start ? Theme.ButtonOn : Theme.ButtonStyle, StartGame));
         buttons.Add(new Button(sx + 22, sy + 13, 14, Format.Center("Statistics", 14), focus == StartFocus.Statistics ? Theme.ButtonOn : Theme.ButtonStyle, () => Screen = Screen.Stats));
+        buttons.AddRange(FooterButtons(StartFooterX));
         return buttons;
     }
 
@@ -171,19 +196,20 @@ internal sealed partial class Ui
         var (dx, dy) = Dialog(WonWidth, WonHeight);
         return
         [
-            new Button(dx + 8, dy + 13, 16, Format.Center("New game (N)", 16), Theme.ButtonOn, GoToStart),
-            new Button(dx + WonWidth - 8 - 12, dy + 13, 12, Format.Center("Quit (Q)", 12), Theme.ButtonStyle, Quit),
+            new Button(dx + 4, dy + 14, 16, Format.Center("New game (N)", 16), Theme.ButtonOn, GoToStart),
+            new Button(dx + 22, dy + 14, 13, Format.Center("Copy id (C)", 13), Theme.ButtonStyle, CopyId),
+            new Button(dx + WonWidth - 4 - 12, dy + 14, 12, Format.Center("Quit (Q)", 12), Theme.ButtonStyle, Quit),
         ];
     }
+    private int StartFooterX => (width - FooterWidth) / 2;
 
     private (int X, int Y) Dialog(int dialogWidth, int dialogHeight) => ((width - dialogWidth) / 2, (height - dialogHeight) / 2);
 
     private void PaintPlaying(ICanvas canvas)
     {
         var game = session.Game!;
-        var px = OriginX + BoardWidth + PanelGap;
-        var py = OriginY + 1;
-        Text(canvas, OriginX, OriginY, "S U D O K U", Theme.Title);
+        var px = PanelX;
+        var py = OriginY;
 
         var progress = Screen switch
         {
@@ -193,21 +219,50 @@ internal sealed partial class Ui
         };
         for (var cell = 0; cell < Game.CellCount; cell++)
         {
-            var (cx, cy) = CellOrigin(cell);
-            var digit = game[cell] == Game.Empty ? " " : game[cell].ToString();
-            var shown = cell == game.Selected ? $"[{digit}]" : digit;
-            Text(canvas, cx, cy, Format.Center(shown, CellWidth), CellStyle(game, cell, progress));
-            Text(canvas, cx, cy + 1, new string(' ', CellWidth), CellStyle(game, cell, progress));
+            PaintCell(canvas, game, cell, CellStyle(game, cell, progress));
         }
 
-        Text(canvas, px, py, game.Sudoku.Difficulty.ToString().ToUpperInvariant(), Theme.Title);
-        Text(canvas, px, py + 1, "Time  " + Format.Time(game.Elapsed), Theme.Normal);
-        Text(canvas, px, py + 2, "Id " + game.Sudoku.Id, Theme.Muted);
-        Text(canvas, OriginX, OriginY + 22, status ?? string.Empty, Theme.Normal);
+        Text(canvas, px, py, "S U D O K U", Theme.Title);
+        Text(canvas, px, py + 1, game.Sudoku.Difficulty.ToString().ToUpperInvariant(), Theme.Title);
+        Text(canvas, px, py + 2, "Time  " + Format.Time(game.Elapsed), Theme.Normal);
+        Text(canvas, px, py + 3, "Id " + game.Sudoku.Id, Theme.Muted);
+        var line = 0;
+        foreach (var text in Format.Wrap(status ?? string.Empty, PanelWidth))
+        {
+            Text(canvas, px, py + 19 + line++, text, Theme.Normal);
+        }
+
+        line = 0;
+        foreach (var text in Help)
+        {
+            Text(canvas, px, py + 22 + line++, text, Theme.Muted);
+        }
+
         PaintButtons(canvas, PlayingButtons());
-        Text(canvas, OriginX, OriginY + 23, "Arrows/click select  1-9 enter  0/Del erase  Ctrl+Z/Y undo/redo  C check", Theme.Muted);
+        PaintFooter(canvas, OriginX);
     }
 
+    private static readonly string[] Help =
+    [
+        "Arrows / click: select",
+        "1-9 enter  0/Del erase",
+        "Ctrl+Z/Y undo / redo",
+        "C check",
+        "Ctrl+C copy id",
+        "R reset  N new  Q quit",
+    ];
+
+    private void PaintCell(ICanvas canvas, Game game, int cell, Style style)
+    {
+        var (cx, cy) = CellOrigin(cell);
+        var selected = cell == game.Selected;
+        var digit = game[cell] == Game.Empty ? "  " : ((char)('\uFF10' + (game[cell] - '0'))).ToString();
+        Text(canvas, cx, cy, new string(' ', CellWidth), style);
+        Text(canvas, cx, cy + 1, selected ? " [" : "  ", style);
+        Text(canvas, cx + 2, cy + 1, digit, style);
+        Text(canvas, cx + 4, cy + 1, selected ? "] " : "  ", style);
+        Text(canvas, cx, cy + 2, new string(' ', CellWidth), style);
+    }
     private static Style CellStyle(Game game, int cell, double progress)
     {
         var row = cell / Game.Size;
@@ -263,11 +318,12 @@ internal sealed partial class Ui
         var sy = (height - StartHeight) / 2;
         Text(canvas, sx, sy, Format.Center("S U D O K U", StartWidth), Theme.Title);
         Text(canvas, sx, sy + 1, Format.Center("Choose a difficulty", StartWidth), Theme.Muted);
-        Text(canvas, sx, sy + 8, Format.Center("Sudoku id (optional, to replay one)", StartWidth), Theme.Muted);
+        Text(canvas, sx, sy + 8, Format.Center("Sudoku id (optional, Ctrl+V pastes)", StartWidth), Theme.Muted);
         Text(canvas, sx, sy + 11, Format.Center(startError ?? string.Empty, StartWidth), Theme.Error);
         var escape = session.Game is { IsSolved: false } ? "Esc back" : "Esc quit";
         Text(canvas, sx - 6, sy + 15, Format.Center($"Up/Down level  Tab focus  Enter start  {escape}", StartWidth + 12), Theme.Muted);
         PaintButtons(canvas, StartButtons());
+        PaintFooter(canvas, StartFooterX);
     }
 
     private void PaintDialog(ICanvas canvas, int dialogWidth, int dialogHeight)
@@ -304,7 +360,8 @@ internal sealed partial class Ui
         Text(canvas, dx + 1, dy + 3, Format.Center($"Solved in {Format.Time(win.Time)}", WonWidth - 2), Theme.Dialog);
         Text(canvas, dx + 1, dy + 4, Format.Center(win.NewFastest ? "New personal best!" : string.Empty, WonWidth - 2), Theme.DialogTitle);
         Text(canvas, dx + 1, dy + 5, Format.Center($"Id {win.Sudoku.Id}", WonWidth - 2), Theme.DialogMuted);
-        PaintTable(canvas, dx + 3, dy + 7, win.Sudoku.Difficulty);
+        Text(canvas, dx + 1, dy + 6, Format.Center(status ?? string.Empty, WonWidth - 2), Theme.DialogMuted);
+        PaintTable(canvas, dx + 3, dy + 8, win.Sudoku.Difficulty);
         PaintButtons(canvas, WonButtons());
     }
 
@@ -314,7 +371,7 @@ internal sealed partial class Ui
         var (dx, dy) = Dialog(StatsWidth, StatsHeight);
         Text(canvas, dx + 1, dy + 1, Format.Center("Statistics", StatsWidth - 2), Theme.DialogTitle);
         PaintTable(canvas, dx + 3, dy + 3, null);
-        Text(canvas, dx + 1, dy + 8, Format.Center("Press any key", StatsWidth - 2), Theme.DialogMuted);
+        Text(canvas, dx + 1, dy + 9, Format.Center("Press any key", StatsWidth - 2), Theme.DialogMuted);
     }
 
     private static void PaintButtons(ICanvas canvas, List<Button> buttons)
@@ -334,5 +391,8 @@ internal sealed partial class Ui
             var row = $"{difficulty,-8}{s.Started,5}{s.Won,6}{Format.Percent(s.WinRate),6}{Format.Time(s.Fastest),9}{Format.Time(s.Average),9}{$"{s.Streak}/{s.BestStreak}",7}";
             Text(canvas, x, y + 1 + (int)difficulty, row, difficulty == highlight ? new Style(Theme.Dark, Theme.Accent) : Theme.Dialog);
         }
+
+        var total = session.Stats.Total;
+        Text(canvas, x, y + 1 + Difficulties.Length, $"{"Total",-8}{total.Started,5}{total.Won,6}{Format.Percent(total.WinRate),6}", Theme.Dialog);
     }
 }

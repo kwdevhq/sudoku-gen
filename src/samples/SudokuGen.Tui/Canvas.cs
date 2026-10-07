@@ -14,6 +14,16 @@ internal interface ICanvas
     void Put(int x, int y, string text, Style style);
 }
 
+/// <summary>What the UI needs from the machine it runs on.</summary>
+internal interface ISystem
+{
+    string? ReadClipboard();
+
+    void WriteClipboard(string text);
+
+    void OpenUrl(string url);
+}
+
 /// <summary>One key press. <see cref="Key"/> is a single character or a name such as Up, Enter, Esc, Tab, Backspace, Delete.</summary>
 internal readonly record struct Input(string Key, bool Ctrl = false)
 {
@@ -29,6 +39,7 @@ internal static class Theme
     public static readonly Rgb Text = new(220, 224, 235);
     public static readonly Rgb Dim = new(120, 128, 150);
     public static readonly Rgb Accent = new(255, 200, 80);
+    public static readonly Rgb Brand = new(0xd0, 0x69, 0x00);
     public static readonly Rgb CellLight = new(40, 45, 62);
     public static readonly Rgb CellDark = new(32, 36, 50);
     public static readonly Rgb UnitHighlight = new(55, 66, 96);
@@ -49,7 +60,9 @@ internal static class Theme
 
     public static Style Muted { get; } = new(Dim, Background);
 
-    public static Style Title { get; } = new(Accent, Background);
+    public static Style Title { get; } = new(Brand, Background);
+
+    public static Style Company { get; } = new(Brand, Background);
 
     public static Style Error { get; } = new(new Rgb(255, 110, 110), Background);
 
@@ -57,9 +70,11 @@ internal static class Theme
 
     public static Style DialogMuted { get; } = new(Dim, DialogBackground);
 
-    public static Style DialogTitle { get; } = new(Accent, DialogBackground);
+    public static Style DialogTitle { get; } = new(Brand, DialogBackground);
 
     public static Style ButtonStyle { get; } = new(Text, ButtonBackground);
+
+    public static Style ButtonDone { get; } = new(Dim, ButtonDisabled);
 
     public static Style ButtonOff { get; } = new(Dim, ButtonDisabled);
 
@@ -73,6 +88,28 @@ internal static class Format
         : "--:--";
 
     public static string Percent(double? rate) => rate is { } r ? $"{Math.Round(r * 100):0}%" : "--";
+
+    public static IEnumerable<string> Wrap(string text, int width)
+    {
+        var line = string.Empty;
+        foreach (var word in text.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (line.Length > 0 && line.Length + 1 + word.Length > width)
+            {
+                yield return line;
+                line = word;
+            }
+            else
+            {
+                line = line.Length == 0 ? word : line + ' ' + word;
+            }
+        }
+
+        if (line.Length > 0)
+        {
+            yield return line;
+        }
+    }
 
     public static string Center(string text, int width) =>
         text.Length >= width ? text[..width] : text.PadLeft(((width - text.Length) / 2) + text.Length).PadRight(width);
