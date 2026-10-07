@@ -64,7 +64,7 @@ A `Sudoku` has `Puzzle`, `Solution`, `Difficulty` and `Id`. `Puzzle` and `Soluti
 The CLI sample shows the data:
 
 ```
-dotnet run --project src/samples/SudokuGen.Cli -- --id DHS6-RJN0-C38 --solution
+dotnet run --project src/samples/SudokuGen.Cli -- --difficulty hard --solution
 ```
 
 ```
@@ -83,6 +83,22 @@ Id: DHS6-RJN0-C38
 | . . . | . . 7 | . 2 3 |
 | 7 . . | . . . | . . . |
 | . 4 . | 3 . 6 | 7 9 . |
++-------+-------+-------+
+
+Solution:
+
++-------+-------+-------+
+| 2 3 1 | 7 4 5 | 8 6 9 |
+| 9 8 4 | 2 6 3 | 1 7 5 |
+| 6 7 5 | 9 1 8 | 2 3 4 |
++-------+-------+-------+
+| 8 2 6 | 4 3 9 | 5 1 7 |
+| 4 5 9 | 6 7 1 | 3 8 2 |
+| 3 1 7 | 8 5 2 | 9 4 6 |
++-------+-------+-------+
+| 1 6 8 | 5 9 7 | 4 2 3 |
+| 7 9 3 | 1 2 4 | 6 5 8 |
+| 5 4 2 | 3 8 6 | 7 9 1 |
 +-------+-------+-------+
 ```
 

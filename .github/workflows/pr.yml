@@ -15,7 +15,10 @@ jobs:
           global-json-file: global.json
       - run: dotnet format src/SudokuGen.slnx --verify-no-changes
       - run: dotnet build src/SudokuGen.slnx -c Release
-      - run: |
-          cd src/tests/SudokuGen.Tests/bin/Release/net10.0; ls | head -50; dotnet SudokuGen.Tests.dll --output Detailed; echo exit=$?
+      - run: dotnet test --solution src/SudokuGen.slnx -c Release --no-build; echo A=$?
+        continue-on-error: true
+      - run: dotnet test --solution src/SudokuGen.slnx -c Release --no-build --coverage --coverage-output-format cobertura; echo B=$?
+        continue-on-error: true
+      - run: pwsh -c 'dotnet test --solution src/SudokuGen.slnx -c Release --no-build; echo C=$LASTEXITCODE'
         continue-on-error: true
       - run: pwsh scripts/check-coverage.ps1 -Configuration Release -NoBuild
