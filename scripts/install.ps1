@@ -61,7 +61,9 @@ try {
     $zipPath = Join-Path $temp $asset
     Write-Host "Downloading $asset ($Version)..."
     Invoke-WebRequest "$base/$asset" -OutFile $zipPath
-    $expected = ((Invoke-RestMethod "$base/$asset.sha256").ToString().Trim() -split '\s+')[0]
+    $sumPath = Join-Path $temp "$asset.sha256"
+    Invoke-WebRequest "$base/$asset.sha256" -OutFile $sumPath
+    $expected = ((Get-Content $sumPath -Raw).Trim() -split '\s+')[0]
     $actual = (Get-FileHash $zipPath -Algorithm SHA256).Hash
     if ($actual -ine $expected) { throw "Checksum mismatch. Expected $expected, got $actual. Nothing was installed." }
 

@@ -23,7 +23,7 @@ The TUI is a sudoku game for the terminal. It supports mouse and keyboard, autos
 Windows x64. Open PowerShell and run:
 
 ```powershell
-iex (irm https://github.com/kwdevhq/sudoku-gen/releases/latest/download/install.ps1)
+iex (irm https://raw.githubusercontent.com/kwdevhq/sudoku-gen/main/scripts/install.ps1)
 sudoku-tui
 ```
 
@@ -32,8 +32,8 @@ The script checks the SHA256 checksum, installs to `%LOCALAPPDATA%\kwdevhq\sudok
 To select a version or to remove the game, run the script with a parameter:
 
 ```powershell
-& ([scriptblock]::Create((irm https://github.com/kwdevhq/sudoku-gen/releases/latest/download/install.ps1))) -Version 1.0.0
-& ([scriptblock]::Create((irm https://github.com/kwdevhq/sudoku-gen/releases/latest/download/install.ps1))) -Uninstall
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/kwdevhq/sudoku-gen/main/scripts/install.ps1))) -Version 1.0.0
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/kwdevhq/sudoku-gen/main/scripts/install.ps1))) -Uninstall
 ```
 
 Uninstall keeps your save and statistics files.

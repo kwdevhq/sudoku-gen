@@ -41,7 +41,6 @@ jobs:
           Compress-Archive -Path artifacts/tui/*.exe, artifacts/tui/*.dll -DestinationPath $zip
           $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
           "$hash  sudoku-tui-win-x64.zip" | Set-Content -NoNewline artifacts/release/sudoku-tui-win-x64.zip.sha256
-          Copy-Item scripts/install.ps1 artifacts/release/install.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: nuget

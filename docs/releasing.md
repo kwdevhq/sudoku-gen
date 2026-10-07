@@ -3,7 +3,7 @@
 A release publishes two things from one git tag:
 
 - the NuGet package `SudokuGen` on nuget.org
-- a GitHub Release with the Windows TUI (`sudoku-tui-win-x64.zip`, its `.sha256` file and `install.ps1`)
+- a GitHub Release with the Windows TUI (`sudoku-tui-win-x64.zip` and its `.sha256` file)
 
 See ADR 0007 and ADR 0008 for the reasons.
 
@@ -39,7 +39,7 @@ Before you make it public, check that the README, `LICENSE` and `NOTICE.md` are 
 
 The workflow gets a short-lived API key at run time. Do not create a long-lived API key.
 
-For a package that does not exist yet, the policy is "pending". The first successful push makes it active and binds it to the package.
+If the first push fails with an authorization error, the policy may need an existing package. In that case, push version 1.0.0 once with a temporary API key, then use trusted publishing for later versions. Check the current nuget.org Trusted Publishing documentation.
 
 ### 4. Set the nuget.org user name
 
