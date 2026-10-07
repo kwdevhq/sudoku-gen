@@ -140,5 +140,9 @@ internal sealed class UiFixture : IDisposable
         Key(Game.Sudoku.Solution[last].ToString());
     }
 
-    public void Dispose() => dir.Dispose();
+    public void Dispose()
+    {
+        Theme.Light = false;
+        dir.Dispose();
+    }
 }

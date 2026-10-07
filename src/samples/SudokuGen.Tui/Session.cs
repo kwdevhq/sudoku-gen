@@ -1,5 +1,7 @@
 namespace SudokuGen.Tui;
 
+internal sealed record ThemeSetting(bool Light);
+
 internal sealed record WinResult(Sudoku Sudoku, TimeSpan Time, bool NewFastest);
 
 /// <summary>
@@ -12,6 +14,7 @@ internal sealed class Session
     private readonly Random? random;
     private readonly JsonFile saveFile;
     private readonly JsonFile statsFile;
+    private readonly JsonFile themeFile;
 
     public Session(string directory, TimeProvider clock, Random? random = null)
     {
@@ -20,11 +23,15 @@ internal sealed class Session
         saveFile = new JsonFile(Path.Combine(directory, "tui-save.json"));
         statsFile = new JsonFile(Path.Combine(directory, "tui-stats.json"));
 
+        themeFile = new JsonFile(Path.Combine(directory, "tui-theme.json"));
+        LightTheme = themeFile.Read<ThemeSetting>()?.Light ?? false;
         Stats = statsFile.Read<Statistics>() is { IsValid: true } stored ? stored : Statistics.Empty;
         Game = saveFile.Read<GameSave>() is { } save ? Game.Restore(save, clock) : null;
     }
 
     public Statistics Stats { get; private set; }
+
+    public bool LightTheme { get; private set; }
 
     /// <summary>The game being played, or null before one is started. Operations below require one.</summary>
     public Game? Game { get; private set; }
@@ -83,6 +90,12 @@ internal sealed class Session
         {
             saveFile.Write(Game.ToSave());
         }
+    }
+
+    public void ToggleTheme()
+    {
+        LightTheme = !LightTheme;
+        themeFile.Write(new ThemeSetting(LightTheme));
     }
 
     private bool Changed(bool changed)

@@ -18,7 +18,7 @@ internal sealed partial class Ui
     private const int StatsHeight = 11;
     private const int StartWidth = 40;
     private const int StartHeight = 16;
-    private const int FooterWidth = 31;
+    private const int FooterWidth = 39;
 
     private bool Fits => width >= MinWidth && height >= MinHeight;
 
@@ -151,6 +151,7 @@ internal sealed partial class Ui
         [
             new Button(x + 11, y, 6, "kw.dev", Theme.Company, () => system.OpenUrl(CompanyUrl)),
             new Button(x + 20, y, 11, "MIT License", Theme.Muted, () => system.OpenUrl(LicenseUrl)),
+            new Button(x + 34, y, 5, "Theme", Theme.Muted, ToggleTheme),
         ];
     }
 
@@ -159,6 +160,7 @@ internal sealed partial class Ui
         var y = OriginY + MinHeight - 1;
         Text(canvas, x, y, "Created by", Theme.Muted);
         Text(canvas, x + 17, y, " · ", Theme.Muted);
+        Text(canvas, x + 31, y, " · ", Theme.Muted);
         PaintButtons(canvas, FooterButtons(x));
     }
     private List<Button> StartButtons()
@@ -173,7 +175,7 @@ internal sealed partial class Ui
             buttons.Add(new Button(sx + 10, sy + 3 + (int)difficulty, 20, " " + label, selected ? Theme.ButtonOn : Theme.ButtonStyle, () => chosen = difficulty));
         }
 
-        var idStyle = focus == StartFocus.Id ? new Style(Theme.Dark, Theme.Text) : Theme.ButtonStyle;
+        var idStyle = focus == StartFocus.Id ? new Style(Theme.Background, Theme.Text) : Theme.ButtonStyle;
         buttons.Add(new Button(sx + 8, sy + 9, 24, " " + idText + (focus == StartFocus.Id ? "▏" : string.Empty), idStyle, () => focus = StartFocus.Id));
         buttons.Add(new Button(sx + 4, sy + 13, 14, Format.Center("Start", 14), focus == StartFocus.Start ? Theme.ButtonOn : Theme.ButtonStyle, StartGame));
         buttons.Add(new Button(sx + 22, sy + 13, 14, Format.Center("Statistics", 14), focus == StartFocus.Statistics ? Theme.ButtonOn : Theme.ButtonStyle, () => Screen = Screen.Stats));
@@ -247,7 +249,7 @@ internal sealed partial class Ui
         "Arrows / click: select",
         "1-9 enter  0/Del erase",
         "Ctrl+Z/Y undo / redo",
-        "C check",
+        "C check  T theme",
         "Ctrl+C copy id",
         "R reset  N new  Q quit",
     ];
@@ -295,7 +297,7 @@ internal sealed partial class Ui
                 (foreground, background) = (Theme.Dark, Theme.Right);
                 break;
             case CellMark.Wrong:
-                (foreground, background) = (Theme.Given, Theme.Wrong);
+                (foreground, background) = (Theme.OnWrong, Theme.Wrong);
                 break;
         }
 

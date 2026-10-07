@@ -9,6 +9,7 @@ internal static class TuiApp
     {
         var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SudokuGen");
         var session = new Session(directory, TimeProvider.System);
+        Theme.Light = session.LightTheme;
         using var app = Application.Create();
         app.Init();
         var ui = new Ui(session, TimeProvider.System, new TerminalSystem(app));

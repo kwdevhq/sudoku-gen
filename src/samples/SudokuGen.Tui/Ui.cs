@@ -65,6 +65,12 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
 
     public void HandleKey(Input input)
     {
+        if (input is { Key: "t", Ctrl: true })
+        {
+            ToggleTheme();
+            return;
+        }
+
         if (Screen == Screen.Start)
         {
             StartKey(input);
@@ -142,6 +148,9 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
             case { Key: "c" }:
                 Check();
                 break;
+            case { Key: "t" }:
+                ToggleTheme();
+                break;
             case { Key: "r" }:
                 RequestReset();
                 break;
@@ -152,6 +161,12 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
                 Quit();
                 break;
         }
+    }
+
+    private void ToggleTheme()
+    {
+        session.ToggleTheme();
+        Theme.Light = session.LightTheme;
     }
 
     private void Enter(char digit)
@@ -262,6 +277,9 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
                 break;
             case "c":
                 CopyId();
+                break;
+            case "t":
+                ToggleTheme();
                 break;
             case "q" or "Esc":
                 Quit();

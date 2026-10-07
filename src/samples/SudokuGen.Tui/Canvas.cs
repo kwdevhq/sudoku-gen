@@ -35,53 +35,79 @@ internal sealed record Button(int X, int Y, int Width, string Label, Style Style
 
 internal static class Theme
 {
-    public static readonly Rgb Background = new(18, 20, 28);
-    public static readonly Rgb Text = new(220, 224, 235);
-    public static readonly Rgb Dim = new(120, 128, 150);
-    public static readonly Rgb Accent = new(255, 200, 80);
-    public static readonly Rgb Brand = new(0xd0, 0x69, 0x00);
-    public static readonly Rgb CellLight = new(40, 45, 62);
-    public static readonly Rgb CellDark = new(32, 36, 50);
-    public static readonly Rgb UnitHighlight = new(58, 70, 102);
-    public static readonly Rgb UnitHighlightDark = new(50, 61, 90);
-    public static readonly Rgb SameDigit = new(100, 78, 156);
-    public static readonly Rgb Selected = new(70, 110, 190);
-    public static readonly Rgb Given = new(240, 240, 250);
-    public static readonly Rgb Entry = new(110, 210, 255);
-    public static readonly Rgb Conflict = new(255, 165, 0);
-    public static readonly Rgb Right = new(144, 238, 144);
-    public static readonly Rgb Wrong = new(205, 55, 55);
-    public static readonly Rgb Flash = new(255, 255, 255);
-    public static readonly Rgb Dark = new(15, 15, 20);
-    public static readonly Rgb ButtonBackground = new(55, 62, 88);
-    public static readonly Rgb ButtonDisabled = new(34, 38, 52);
-    public static readonly Rgb DialogBackground = new(28, 32, 46);
+    /// <summary>Selects the light palette. Set once at start-up and when the player toggles the theme.</summary>
+    public static bool Light { get; set; }
 
-    public static Style Normal { get; } = new(Text, Background);
+    public static Rgb Background => Pick(new(18, 20, 28), new(246, 247, 251));
 
-    public static Style Muted { get; } = new(Dim, Background);
+    public static Rgb Text => Pick(new(220, 224, 235), new(28, 32, 46));
 
-    public static Style Title { get; } = new(Brand, Background);
+    public static Rgb Dim => Pick(new(120, 128, 150), new(104, 110, 130));
 
-    public static Style Company { get; } = new(Brand, Background);
+    public static Rgb Accent => new(255, 200, 80);
 
-    public static Style Error { get; } = new(new Rgb(255, 110, 110), Background);
+    public static Rgb Brand => new(0xd0, 0x69, 0x00);
 
-    public static Style Dialog { get; } = new(Text, DialogBackground);
+    public static Rgb CellLight => Pick(new(40, 45, 62), new(236, 239, 246));
 
-    public static Style DialogMuted { get; } = new(Dim, DialogBackground);
+    public static Rgb CellDark => Pick(new(32, 36, 50), new(226, 230, 240));
 
-    public static Style DialogTitle { get; } = new(Brand, DialogBackground);
+    public static Rgb UnitHighlight => Pick(new(58, 70, 102), new(204, 216, 240));
 
-    public static Style ButtonStyle { get; } = new(Text, ButtonBackground);
+    public static Rgb UnitHighlightDark => Pick(new(50, 61, 90), new(194, 207, 235));
 
-    public static Style ButtonDone { get; } = new(Dim, ButtonDisabled);
+    public static Rgb SameDigit => Pick(new(100, 78, 156), new(208, 188, 242));
 
-    public static Style ButtonOff { get; } = new(Dim, ButtonDisabled);
+    public static Rgb Selected => Pick(new(70, 110, 190), new(130, 170, 240));
 
-    public static Style ButtonOn { get; } = new(Dark, Accent);
+    public static Rgb Given => Pick(new(240, 240, 250), new(20, 22, 32));
+
+    public static Rgb Entry => Pick(new(110, 210, 255), new(10, 90, 190));
+
+    public static Rgb Conflict => Pick(new(255, 165, 0), new(196, 100, 0));
+
+    public static Rgb Right => new(144, 238, 144);
+
+    public static Rgb Wrong => new(205, 55, 55);
+
+    public static Rgb OnWrong => new(250, 250, 255);
+
+    public static Rgb Flash => Pick(new(255, 255, 255), new(255, 226, 120));
+
+    public static Rgb Dark => new(15, 15, 20);
+
+    public static Rgb ButtonBackground => Pick(new(55, 62, 88), new(208, 213, 228));
+
+    public static Rgb ButtonDisabled => Pick(new(34, 38, 52), new(228, 231, 239));
+
+    public static Rgb DialogBackground => Pick(new(28, 32, 46), new(255, 255, 255));
+
+    public static Style Normal => new(Text, Background);
+
+    public static Style Muted => new(Dim, Background);
+
+    public static Style Title => new(Brand, Background);
+
+    public static Style Company => new(Brand, Background);
+
+    public static Style Error => new(Pick(new(255, 110, 110), new(196, 40, 40)), Background);
+
+    public static Style Dialog => new(Text, DialogBackground);
+
+    public static Style DialogMuted => new(Dim, DialogBackground);
+
+    public static Style DialogTitle => new(Brand, DialogBackground);
+
+    public static Style ButtonStyle => new(Text, ButtonBackground);
+
+    public static Style ButtonDone => new(Dim, ButtonDisabled);
+
+    public static Style ButtonOff => new(Dim, ButtonDisabled);
+
+    public static Style ButtonOn => new(Dark, Accent);
+
+    private static Rgb Pick(Rgb dark, Rgb light) => Light ? light : dark;
 }
-
 internal static class Format
 {
     public static string Time(TimeSpan? time) => time is { } t

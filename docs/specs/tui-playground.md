@@ -93,3 +93,4 @@ Rules:
 - Any entry clears all Check marks.
 - Left/Right run on into the next/previous row; Up/Down keep the column.
 - Typing or pasting id characters on the start screen focuses the id field.
+- A second, lighter theme: toggled with T while playing or on the win screen, Ctrl+T on any screen, or the Theme footer button (also on the start screen). The choice is saved in tui-theme.json.
