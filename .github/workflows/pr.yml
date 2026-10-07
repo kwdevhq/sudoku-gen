@@ -15,5 +15,4 @@ jobs:
           global-json-file: global.json
       - run: dotnet format SudokuGen.slnx --verify-no-changes
       - run: dotnet build SudokuGen.slnx -c Release
-      - run: dotnet test --solution SudokuGen.slnx -c Release --no-build --coverage --coverage-output-format cobertura
-      - run: pwsh scripts/check-coverage.ps1
+      - run: pwsh scripts/check-coverage.ps1 -Configuration Release -NoBuild

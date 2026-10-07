@@ -52,6 +52,8 @@ This repository is a playground: every sample (TUI, API, solver, ...) consumes t
 dotnet run --project samples/SudokuGen.Cli -- --difficulty hard --solution
 dotnet run --project samples/SudokuGen.Cli -- --id 12-3-457-1022-203456 --format json
 dotnet test --solution SudokuGen.slnx --coverage
+pwsh scripts/coverage-report.ps1   # visual per-line HTML report (coverage-report/index.html)
+pwsh scripts/check-coverage.ps1   # clean run that fails below 100% line/branch coverage (used by CI)
 dotnet run -c Release --project benchmarks/SudokuGen.Benchmarks -- --filter '*'   # add --job short for a quick run
 ```
 
