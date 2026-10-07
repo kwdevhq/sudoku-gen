@@ -15,4 +15,4 @@ jobs:
           global-json-file: global.json
       - run: dotnet format src/SudokuGen.slnx --verify-no-changes
       - run: dotnet build src/SudokuGen.slnx -c Release
-      - run: pwsh scripts/check-coverage.ps1 -Configuration Release -NoBuild
+      - run: pwsh scripts/check-coverage.ps1 -Configuration Release -NoBuild -TestArgs --output,Detailed,--diagnostic,--diagnostic-verbosity,Trace
