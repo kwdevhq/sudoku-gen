@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/SudokuGen.Cli/SudokuGen.Cli.csproj" />
+    <Project Path="samples/SudokuGen.Tui/SudokuGen.Tui.csproj" />
   </Folder>
   <Folder Name="/core/">
     <Project Path="core/SudokuGen.csproj" />
@@ -12,3 +13,4 @@
     <Project Path="tests/SudokuGen.Tests/SudokuGen.Tests.csproj" />
   </Folder>
 </Solution>
+
