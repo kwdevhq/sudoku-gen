@@ -302,8 +302,9 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
             case "Backspace" when focus == StartFocus.Id:
                 idText = idText.Length > 0 ? idText[..^1] : idText;
                 break;
-            case [var c] when focus == StartFocus.Id && !input.Ctrl && IsIdChar(c) && idText.Length < MaxIdLength:
-                idText += char.ToUpperInvariant(c);
+            case [var c] when !input.Ctrl && IsIdChar(c):
+                focus = StartFocus.Id;
+                idText = idText.Length < MaxIdLength ? idText + char.ToUpperInvariant(c) : idText;
                 break;
         }
     }

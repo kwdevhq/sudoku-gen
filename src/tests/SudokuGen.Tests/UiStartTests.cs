@@ -74,14 +74,27 @@ public class UiStartTests
     }
 
     [Test]
-    public async Task Typing_IsIgnoredOutsideTheIdField()
+    public async Task Typing_FocusesTheIdFieldEvenWhenAnotherButtonHasFocus()
     {
         using var f = new UiFixture(startGame: false);
 
         f.Type("abc");
         f.Key("Backspace");
 
-        await Assert.That(f.Paint().Contains("ABC")).IsFalse();
+        await Assert.That(f.Paint().Contains("AB▏")).IsTrue();
+    }
+
+    [Test]
+    public async Task Backspace_OnAnEmptyIdChangesNothing()
+    {
+        using var f = new UiFixture(startGame: false);
+        f.Key("Tab");
+        f.Key("Tab");
+        f.Key("Tab");
+        f.Key("Backspace");
+        f.Key("Backspace");
+
+        await Assert.That(f.Paint().Contains("Start")).IsTrue();
     }
 
     [Test]

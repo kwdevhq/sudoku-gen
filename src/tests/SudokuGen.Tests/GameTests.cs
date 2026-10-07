@@ -55,9 +55,29 @@ public class GameTests
         await Assert.That(game.Enter('5')).IsTrue();
         await Assert.That(game[cell]).IsEqualTo('5');
         await Assert.That(game.EntryCount).IsEqualTo(1);
-        await Assert.That(game.Enter('5')).IsFalse();
-        await Assert.That(game.Enter(Game.Empty)).IsTrue();
+        await Assert.That(game.Enter('5')).IsTrue();
+        await Assert.That(game[cell]).IsEqualTo(Game.Empty);
         await Assert.That(game.EntryCount).IsEqualTo(0);
+        await Assert.That(game.Enter(Game.Empty)).IsFalse();
+    }
+
+    [Test]
+    public async Task MovingSideways_RunsOnIntoTheNextAndPreviousRow()
+    {
+        var game = TuiHelpers.NewGame();
+        game.Select(8);
+        game.Move(0, 1);
+        await Assert.That(game.Selected).IsEqualTo(9);
+        game.Move(0, -1);
+        await Assert.That(game.Selected).IsEqualTo(8);
+        game.Select(80);
+        game.Move(0, 1);
+        await Assert.That(game.Selected).IsEqualTo(80);
+        game.Select(0);
+        game.Move(0, -1);
+        await Assert.That(game.Selected).IsEqualTo(0);
+        game.Move(-1, 0);
+        await Assert.That(game.Selected).IsEqualTo(0);
     }
 
     [Test]
@@ -146,7 +166,7 @@ public class GameTests
     }
 
     [Test]
-    public async Task Marks_VanishWhenTheCellIsEditedOrOnUndo()
+    public async Task Marks_VanishOnAnyEditAndOnUndoRedo()
     {
         var game = TuiHelpers.NewGame();
         var a = TuiHelpers.FirstEmpty(game);
@@ -157,8 +177,9 @@ public class GameTests
 
         TuiHelpers.Put(game, a, Game.Empty);
         await Assert.That(game.MarkAt(a)).IsEqualTo(CellMark.None);
-        await Assert.That(game.MarkAt(b)).IsEqualTo(CellMark.Wrong);
+        await Assert.That(game.MarkAt(b)).IsEqualTo(CellMark.None);
 
+        game.Check();
         game.Undo();
         await Assert.That(game.MarkAt(b)).IsEqualTo(CellMark.None);
 

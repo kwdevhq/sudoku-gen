@@ -84,14 +84,25 @@ internal sealed class Game
 
     public void Select(int cell) => Selected = Math.Clamp(cell, 0, CellCount - 1);
 
+    /// <summary>Moves vertically within the column; moving sideways runs on into the next or previous row.</summary>
     public void Move(int rowDelta, int columnDelta) =>
-        Selected = (Math.Clamp((Selected / Size) + rowDelta, 0, Size - 1) * Size) + Math.Clamp((Selected % Size) + columnDelta, 0, Size - 1);
+        Selected = Math.Clamp((Math.Clamp((Selected / Size) + rowDelta, 0, Size - 1) * Size) + (Selected % Size) + columnDelta, 0, CellCount - 1);
 
-    /// <summary>Puts a digit (<c>1</c>-<c>9</c>) or <see cref="Empty"/> into the selected cell; false when nothing changed.</summary>
+    /// <summary>Puts a digit (<c>1</c>-<c>9</c>) or <see cref="Empty"/> into the selected cell; entering the digit that is already there clears it. False when nothing changed.</summary>
     public bool Enter(char digit)
     {
         var valid = digit == Empty || digit is >= '1' and <= '9';
-        if (!valid || IsSolved || IsGiven(Selected) || cells[Selected] == digit)
+        if (!valid || IsSolved || IsGiven(Selected))
+        {
+            return false;
+        }
+
+        if (cells[Selected] == digit)
+        {
+            digit = Empty;
+        }
+
+        if (cells[Selected] == digit)
         {
             return false;
         }
@@ -99,7 +110,7 @@ internal sealed class Game
         undo.Add(new Change(Selected, cells[Selected], digit));
         redo.Clear();
         Apply(Selected, digit);
-        marks[Selected] = CellMark.None;
+        Array.Clear(marks);
         return true;
     }
 

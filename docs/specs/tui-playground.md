@@ -86,3 +86,10 @@ Rules:
 
 1. Minimal, strict coverage exemption for the UI shell.
 2. Local JSON save and statistics; save deleted on win.
+
+## Amendments
+
+- Entering the digit a cell already holds clears it (key or pad click).
+- Any entry clears all Check marks.
+- Left/Right run on into the next/previous row; Up/Down keep the column.
+- Typing or pasting id characters on the start screen focuses the id field.
