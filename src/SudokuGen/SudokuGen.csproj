@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SudokuGen</RootNamespace>
+    <PackageId>SudokuGen</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>kwdevhq, Pete Williams</Authors>
+    <Description>A fast sudoku puzzle generator. .NET port of petewritescode/sudoku-gen: transforms known seed puzzles into new ones.</Description>
+    <PackageTags>sudoku;puzzle;generator</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/kwdevhq/sudoku-gen</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\NOTICE.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SudokuGen.Tests" />
+  </ItemGroup>
+
+</Project>

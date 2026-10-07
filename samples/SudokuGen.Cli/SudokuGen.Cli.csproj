@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SudokuGen.Cli</RootNamespace>
+    <AssemblyName>sudoku-gen</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SudokuGen\SudokuGen.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/SudokuGen.Benchmarks/SudokuGen.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/SudokuGen.Cli/SudokuGen.Cli.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/SudokuGen/SudokuGen.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SudokuGen.Tests/SudokuGen.Tests.csproj" />
+  </Folder>
+</Solution>

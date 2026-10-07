@@ -1,4 +1,9 @@
-node_modules
-/.vscode
-/dist
-/coverage
+bin/
+obj/
+.vs/
+*.user
+*.nupkg
+*.snupkg
+TestResults/
+artifacts/
+BenchmarkDotNet.Artifacts/
