@@ -8,3 +8,5 @@
 - CI (`.github/workflows/pr.yml`) enforces format, warnings-as-errors and 100% coverage via `scripts/check-coverage.ps1` (clean test run, then verifies every coverage report). `pwsh scripts/check.ps1` runs all of it; run it before committing, or enable the hook once with `git config core.hooksPath .githooks`.
 - The aihero.dev skills are installed globally, not vendored. Reach for `grilling` to settle design, `tdd` to implement, `domain-modeling` for glossary and ADRs, `diagnosing-bugs` for failures.
 - Copyright holder is "kw.dev gmbh", never a personal name; keep upstream attribution in LICENSE and NOTICE.md.
+- CI runs exactly `pwsh scripts/check.ps1`; keep it the only gate definition. Coverage is judged in Debug, because Release string-switch codegen shows phantom uncovered branches. Linux-only failures reproduce in WSL: `wsl -d Ubuntu`, clone to `~/`, run the same script.
+- Windows shell gotchas: a running `sudoku-tui.exe` locks the build (stop it by PID); never name a PowerShell function `Rd` (aliases `Remove-Item`); files are LF.
