@@ -262,6 +262,10 @@ internal sealed partial class Ui
         Text(canvas, cx + 2, cy + 1, digit, style);
         Text(canvas, cx + 4, cy + 1, selected ? "] " : "  ", style);
         Text(canvas, cx, cy + 2, new string(' ', CellWidth), style);
+        var grid = new Style(style.Fg, Theme.Grid);
+        Text(canvas, cx + CellWidth - 1, cy, " ", grid);
+        Text(canvas, cx + CellWidth - 1, cy + 1, " ", grid);
+        Text(canvas, cx, cy + CellHeight - 1, new string(' ', CellWidth), grid);
     }
     private static Style CellStyle(Game game, int cell, double progress)
     {

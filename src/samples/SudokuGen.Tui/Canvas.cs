@@ -41,6 +41,7 @@ internal static class Theme
     public static readonly Rgb Accent = new(255, 200, 80);
     public static readonly Rgb Brand = new(0xd0, 0x69, 0x00);
     public static readonly Rgb CellLight = new(40, 45, 62);
+    public static readonly Rgb Grid = new(16, 18, 26);
     public static readonly Rgb CellDark = new(32, 36, 50);
     public static readonly Rgb UnitHighlight = new(55, 66, 96);
     public static readonly Rgb SameDigit = new(100, 78, 156);
