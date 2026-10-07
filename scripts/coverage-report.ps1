@@ -5,7 +5,7 @@ param([switch]$NoOpen)
 Set-Location (Join-Path $PSScriptRoot '..')
 Remove-Item -Recurse -Force TestResults, coverage-report -ErrorAction SilentlyContinue
 
-dotnet test --solution SudokuGen.slnx --coverage --coverage-output-format cobertura
+dotnet test --solution src/SudokuGen.slnx --coverage --coverage-output-format cobertura
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 dotnet tool restore | Out-Null

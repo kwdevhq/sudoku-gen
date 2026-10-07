@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SudokuGen\SudokuGen.csproj" />
+    <ProjectReference Include="..\..\core\SudokuGen.csproj" />
     <InternalsVisibleTo Include="SudokuGen.Tests" />
   </ItemGroup>
 

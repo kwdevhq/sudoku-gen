@@ -7,10 +7,10 @@ param(
 )
 
 Set-Location (Join-Path $PSScriptRoot '..')
-Remove-Item -Recurse -Force TestResults, tests/*/TestResults -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force TestResults, src/tests/*/TestResults -ErrorAction SilentlyContinue
 
 $build = if ($NoBuild) { @('--no-build') } else { @() }
-dotnet test --solution SudokuGen.slnx -c $Configuration @build --coverage --coverage-output-format cobertura @TestArgs
+dotnet test --solution src/SudokuGen.slnx -c $Configuration @build --coverage --coverage-output-format cobertura @TestArgs
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $reports = @(Get-ChildItem -Path . -Recurse -Filter '*.cobertura.xml' -File | Where-Object { $_.FullName -notmatch '[\\/](bin|obj|coverage-report)[\\/]' })

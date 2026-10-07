@@ -10,13 +10,13 @@ public partial class DocumentedIdTests
 
     [Test]
     [Arguments("README.md")]
-    [Arguments("src/SudokuGen/SudokuId.cs")]
+    [Arguments("src/core/SudokuId.cs")]
     [Arguments("docs/adr/0003-reproduce-with-sudoku-id.md")]
     [Arguments("GLOSSARY.md")]
-    [Arguments("samples/SudokuGen.Cli/Program.cs")]
+    [Arguments("src/samples/SudokuGen.Cli/Program.cs")]
     public async Task ExampleIds_AreValid(string relativePath)
     {
-        var text = await File.ReadAllTextAsync(Path.Combine(RepositoryRoot(), relativePath));
+        var text = await File.ReadAllTextAsync(Path.Combine(Repository.Root, relativePath));
         var matches = IdPattern().Matches(text);
 
         await Assert.That(matches.Count).IsGreaterThan(0);
@@ -24,16 +24,5 @@ public partial class DocumentedIdTests
         {
             await Assert.That(SudokuId.TryParse(match.Value, out _)).IsTrue();
         }
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "SudokuGen.slnx")))
-        {
-            directory = directory.Parent;
-        }
-
-        return directory?.FullName ?? throw new InvalidOperationException("SudokuGen.slnx not found above the test output.");
     }
 }

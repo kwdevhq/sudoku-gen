@@ -5,8 +5,8 @@
   <Folder Name="/samples/">
     <Project Path="samples/SudokuGen.Cli/SudokuGen.Cli.csproj" />
   </Folder>
-  <Folder Name="/src/">
-    <Project Path="src/SudokuGen/SudokuGen.csproj" />
+  <Folder Name="/core/">
+    <Project Path="core/SudokuGen.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/SudokuGen.Tests/SudokuGen.Tests.csproj" />

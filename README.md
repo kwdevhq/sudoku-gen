@@ -41,20 +41,20 @@ Each seed yields over 2.4 trillion distinct puzzles, and generation is a couple 
 
 | Path | Purpose |
 | --- | --- |
-| `src/SudokuGen` | The reusable library (NuGet package `SudokuGen`) |
-| `tests/SudokuGen.Tests` | TUnit tests (with coverage), including unique-solution checks |
-| `samples/SudokuGen.Cli` | Minimal CLI playground |
-| `benchmarks/SudokuGen.Benchmarks` | BenchmarkDotNet benchmarks for generation |
+| `src/core` | The reusable library (NuGet package `SudokuGen`) |
+| `src/tests/SudokuGen.Tests` | TUnit tests (with coverage), including unique-solution checks |
+| `src/samples/SudokuGen.Cli` | Minimal CLI playground |
+| `src/benchmarks/SudokuGen.Benchmarks` | BenchmarkDotNet benchmarks for generation |
 
 This repository is a playground: every sample (TUI, API, solver, ...) consumes the same library.
 
 ```
-dotnet run --project samples/SudokuGen.Cli -- --difficulty hard --solution
-dotnet run --project samples/SudokuGen.Cli -- --id DHS6-RJN0-C38 --format json
-dotnet test --solution SudokuGen.slnx --coverage
+dotnet run --project src/samples/SudokuGen.Cli -- --difficulty hard --solution
+dotnet run --project src/samples/SudokuGen.Cli -- --id DHS6-RJN0-C38 --format json
+dotnet test --solution src/SudokuGen.slnx --coverage
 pwsh scripts/coverage-report.ps1   # visual per-line HTML report (coverage-report/index.html)
 pwsh scripts/check-coverage.ps1   # clean run that fails below 100% line/branch coverage (used by CI)
-dotnet run -c Release --project benchmarks/SudokuGen.Benchmarks -- --filter '*'   # add --job short for a quick run
+dotnet run -c Release --project src/benchmarks/SudokuGen.Benchmarks -- --filter '*'   # add --job short for a quick run
 ```
 
 Contributors and AI agents: see [AGENTS.md](AGENTS.md) and [GLOSSARY.md](GLOSSARY.md).
