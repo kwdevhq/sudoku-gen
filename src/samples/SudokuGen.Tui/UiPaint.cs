@@ -2,12 +2,11 @@ namespace SudokuGen.Tui;
 
 internal sealed partial class Ui
 {
-    private const int BoardWidth = 56;
+    private const int PadWidth = 6;
+    private const int LargeMinWidth = 100;
+    private const int LargeMinHeight = 40;
     private const int PanelGap = 2;
     private const int PanelWidth = 22;
-    private const int TotalWidth = BoardWidth + PanelGap + PanelWidth;
-    private const int CellWidth = 6;
-    private const int CellHeight = 3;
     private const string LicenseUrl = "https://github.com/kwdevhq/sudoku-gen/blob/main/LICENSE";
     private const string CompanyUrl = "https://kw.dev";
     private const int ConfirmWidth = 52;
@@ -17,14 +16,29 @@ internal sealed partial class Ui
     private const int StatsWidth = 56;
     private const int StatsHeight = 11;
     private const int StartWidth = 40;
-    private const int StartHeight = 16;
+    private const int StartHeight = 18;
+    private const int MenuWidth = 36;
+    private const int MenuHeight = 9;
     private const int FooterWidth = 39;
 
     private bool Fits => width >= MinWidth && height >= MinHeight;
 
+    /// <summary>Roomy terminals get a bigger board: wider and taller cells.</summary>
+    private bool Large => width >= LargeMinWidth && height >= LargeMinHeight;
+
+    private int CellWidth => Large ? 8 : 6;
+
+    private int CellHeight => Large ? 4 : 3;
+
+    private int LayoutHeight => Large ? LargeMinHeight : MinHeight;
+
+    private int BoardWidth => (Game.Size * CellWidth) + 2;
+
+    private int TotalWidth => BoardWidth + PanelGap + PanelWidth;
+
     private int OriginX => (width - TotalWidth) / 2;
 
-    private int OriginY => (height - MinHeight) / 2;
+    private int OriginY => (height - LayoutHeight) / 2;
 
     public void Paint(ICanvas canvas)
     {
@@ -59,6 +73,10 @@ internal sealed partial class Ui
                 else if (Screen == Screen.Won)
                 {
                     PaintWon(canvas);
+                }
+                else if (Screen == Screen.Menu)
+                {
+                    PaintMenu(canvas);
                 }
 
                 break;
@@ -111,6 +129,11 @@ internal sealed partial class Ui
             return ConfirmButtons();
         }
 
+        if (Screen == Screen.Menu)
+        {
+            return MenuButtons();
+        }
+
         return Screen == Screen.Won ? WonButtons() : [];
     }
 
@@ -126,7 +149,7 @@ internal sealed partial class Ui
         {
             var d = (char)('0' + digit);
             var style = game.IsDigitComplete(d) ? Theme.ButtonDone : Theme.ButtonStyle;
-            buttons.Add(new Button(px + (((digit - 1) % 3) * 7), py + 5 + (((digit - 1) / 3) * 2), CellWidth, Format.Center(d.ToString(), CellWidth), style, () => Enter(d)));
+            buttons.Add(new Button(px + (((digit - 1) % 3) * 7), py + 5 + (((digit - 1) / 3) * 2), PadWidth, Format.Center(d.ToString(), PadWidth), style, () => Enter(d)));
         }
 
         buttons.Add(new Button(px + 17, py + 3, 5, "Copy", Theme.ButtonStyle, CopyId));
@@ -146,7 +169,7 @@ internal sealed partial class Ui
 
     private List<Button> FooterButtons(int x)
     {
-        var y = OriginY + MinHeight - 1;
+        var y = OriginY + LayoutHeight - 1;
         return
         [
             new Button(x + 11, y, 6, "kw.dev", Theme.Company, () => system.OpenUrl(CompanyUrl)),
@@ -157,7 +180,7 @@ internal sealed partial class Ui
 
     private void PaintFooter(ICanvas canvas, int x)
     {
-        var y = OriginY + MinHeight - 1;
+        var y = OriginY + LayoutHeight - 1;
         Text(canvas, x, y, "Created by", Theme.Muted);
         Text(canvas, x + 17, y, " · ", Theme.Muted);
         Text(canvas, x + 31, y, " · ", Theme.Muted);
@@ -179,6 +202,7 @@ internal sealed partial class Ui
         buttons.Add(new Button(sx + 8, sy + 9, 24, " " + idText + (focus == StartFocus.Id ? "▏" : string.Empty), idStyle, () => focus = StartFocus.Id));
         buttons.Add(new Button(sx + 4, sy + 13, 14, Format.Center("Start", 14), focus == StartFocus.Start ? Theme.ButtonOn : Theme.ButtonStyle, StartGame));
         buttons.Add(new Button(sx + 22, sy + 13, 14, Format.Center("Statistics", 14), focus == StartFocus.Statistics ? Theme.ButtonOn : Theme.ButtonStyle, () => Screen = Screen.Stats));
+        buttons.Add(new Button(sx + 13, sy + 15, 14, Format.Center("Quit", 14), focus == StartFocus.Quit ? Theme.ButtonOn : Theme.ButtonStyle, Quit));
         buttons.AddRange(FooterButtons(StartFooterX));
         return buttons;
     }
@@ -190,6 +214,18 @@ internal sealed partial class Ui
         [
             new Button(dx + (ConfirmWidth / 2) - 12, dy + 5, 10, Format.Center("Yes (Y)", 10), Theme.ButtonOn, Confirmed),
             new Button(dx + (ConfirmWidth / 2) + 2, dy + 5, 10, Format.Center("No (N)", 10), Theme.ButtonStyle, () => Screen = Screen.Playing),
+        ];
+    }
+
+    private List<Button> MenuButtons()
+    {
+        var (dx, dy) = Dialog(MenuWidth, MenuHeight);
+        var x = dx + ((MenuWidth - 20) / 2);
+        return
+        [
+            new Button(x, dy + 3, 20, Format.Center("Resume (Esc)", 20), Theme.ButtonOn, () => Screen = Screen.Playing),
+            new Button(x, dy + 5, 20, Format.Center("Main menu (M)", 20), Theme.ButtonStyle, GoToStart),
+            new Button(x, dy + 7, 20, Format.Center("Quit (Q)", 20), Theme.ButtonStyle, Quit),
         ];
     }
 
@@ -252,6 +288,7 @@ internal sealed partial class Ui
         "C check  T theme",
         "Ctrl+C copy id",
         "R reset  N new  Q quit",
+        "Esc game menu",
     ];
 
     private void PaintCell(ICanvas canvas, Game game, int cell, Style style)
@@ -259,11 +296,19 @@ internal sealed partial class Ui
         var (cx, cy) = CellOrigin(cell);
         var selected = cell == game.Selected;
         var digit = game[cell] == Game.Empty ? "  " : ((char)('\uFF10' + (game[cell] - '0'))).ToString();
-        Text(canvas, cx, cy, new string(' ', CellWidth), style);
-        Text(canvas, cx, cy + 1, selected ? " [" : "  ", style);
-        Text(canvas, cx + 2, cy + 1, digit, style);
-        Text(canvas, cx + 4, cy + 1, selected ? "] " : "  ", style);
-        Text(canvas, cx, cy + 2, new string(' ', CellWidth), style);
+        var left = cx + ((CellWidth - 2) / 2);
+        for (var y = 0; y < CellHeight; y++)
+        {
+            Text(canvas, cx, cy + y, new string(' ', CellWidth), style);
+        }
+
+        var middle = cy + ((CellHeight - 1) / 2);
+        Text(canvas, left, middle, digit, style);
+        if (selected)
+        {
+            Text(canvas, left - 1, middle, "[", style);
+            Text(canvas, left + 2, middle, "]", style);
+        }
     }
     private static Style CellStyle(Game game, int cell, double progress)
     {
@@ -323,7 +368,7 @@ internal sealed partial class Ui
         Text(canvas, sx, sy + 8, Format.Center("Sudoku id (optional, Ctrl+V pastes)", StartWidth), Theme.Muted);
         Text(canvas, sx, sy + 11, Format.Center(startError ?? string.Empty, StartWidth), Theme.Error);
         var escape = session.Game is { IsSolved: false } ? "Esc back" : "Esc quit";
-        Text(canvas, sx - 6, sy + 15, Format.Center($"Up/Down level  Tab focus  Enter start  {escape}", StartWidth + 12), Theme.Muted);
+        Text(canvas, sx - 6, sy + 17, Format.Center($"Up/Down level  Tab focus  Enter start  {escape}", StartWidth + 12), Theme.Muted);
         PaintButtons(canvas, StartButtons());
         PaintFooter(canvas, StartFooterX);
     }
@@ -351,6 +396,14 @@ internal sealed partial class Ui
         Text(canvas, dx + 1, dy + 1, Format.Center(title, ConfirmWidth - 2), Theme.DialogTitle);
         Text(canvas, dx + 1, dy + 3, Format.Center(detail, ConfirmWidth - 2), Theme.Dialog);
         PaintButtons(canvas, ConfirmButtons());
+    }
+
+    private void PaintMenu(ICanvas canvas)
+    {
+        PaintDialog(canvas, MenuWidth, MenuHeight);
+        var (dx, dy) = Dialog(MenuWidth, MenuHeight);
+        Text(canvas, dx + 1, dy + 1, Format.Center("Game menu", MenuWidth - 2), Theme.DialogTitle);
+        PaintButtons(canvas, MenuButtons());
     }
 
     private void PaintWon(ICanvas canvas)

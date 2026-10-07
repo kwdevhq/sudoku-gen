@@ -8,6 +8,7 @@ internal enum Screen
     Animating,
     Won,
     Stats,
+    Menu,
 }
 
 internal enum StartFocus
@@ -15,6 +16,7 @@ internal enum StartFocus
     Id,
     Start,
     Statistics,
+    Quit,
 }
 
 internal enum PendingAction
@@ -82,6 +84,10 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
         else if (Screen == Screen.Confirm)
         {
             ConfirmKey(input);
+        }
+        else if (Screen == Screen.Menu)
+        {
+            MenuKey(input);
         }
         else if (Screen == Screen.Won)
         {
@@ -157,7 +163,26 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
             case { Key: "n" }:
                 RequestNewGame();
                 break;
-            case { Key: "q" or "Esc" }:
+            case { Key: "q" }:
+                Quit();
+                break;
+            case { Key: "Esc" }:
+                Screen = Screen.Menu;
+                break;
+        }
+    }
+
+    private void MenuKey(Input input)
+    {
+        switch (input.Key)
+        {
+            case "Esc" or "Enter":
+                Screen = Screen.Playing;
+                break;
+            case "m":
+                GoToStart();
+                break;
+            case "q":
                 Quit();
                 break;
         }
@@ -304,6 +329,10 @@ internal sealed partial class Ui(Session session, TimeProvider clock, ISystem sy
                 if (focus == StartFocus.Statistics)
                 {
                     Screen = Screen.Stats;
+                }
+                else if (focus == StartFocus.Quit)
+                {
+                    Quit();
                 }
                 else
                 {

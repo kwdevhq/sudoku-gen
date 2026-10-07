@@ -138,7 +138,6 @@ public class UiPlayingTests
 
     [Test]
     [Arguments("q")]
-    [Arguments("Esc")]
     public async Task Quit_SavesAndRequestsTheEnd(string key)
     {
         using var f = new UiFixture();

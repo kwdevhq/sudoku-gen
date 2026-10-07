@@ -94,3 +94,5 @@ Rules:
 - Left/Right run on into the next/previous row; Up/Down keep the column.
 - Typing or pasting id characters on the start screen focuses the id field.
 - A second, lighter theme: toggled with T while playing or on the win screen, Ctrl+T on any screen, or the Theme footer button (also on the start screen). The choice is saved in tui-theme.json.
+- Esc while playing opens a game menu (Resume, Main menu, Quit) instead of quitting; the start screen has a Quit button.
+- Terminals of at least 100x40 draw a bigger board (8x4 cells); 80x30 keeps 6x3.
