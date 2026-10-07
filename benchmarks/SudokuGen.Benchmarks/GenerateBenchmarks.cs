@@ -5,7 +5,7 @@ namespace SudokuGen.Benchmarks;
 [MemoryDiagnoser]
 public class GenerateBenchmarks
 {
-    private static readonly SudokuId FixedId = new(12, 3, 457, 1022, 203456);
+    private static readonly SudokuId FixedId = new(66, 3, 457, 1022, 203456);
 
     private readonly Random _random = new(42);
 
@@ -23,7 +23,7 @@ public class GenerateBenchmarks
     public Sudoku ByDifficulty(Difficulty difficulty) => SudokuGenerator.Generate(difficulty, random: _random);
 
     [Benchmark]
-    public Sudoku FromId() => SudokuGenerator.Generate(id: FixedId);
+    public Sudoku FromId() => SudokuGenerator.FromId(FixedId);
 
     [Benchmark]
     public SudokuId ParseId() => SudokuId.Parse("12-3-457-1022-203456");

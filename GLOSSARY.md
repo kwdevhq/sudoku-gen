@@ -12,7 +12,9 @@
 
 **Transformation**: A change to a seed that preserves solvability: rotation, shuffling of bands, stacks, rows or columns, or relabelling of digits.
 
-**Sudoku id**: The identifier of one specific sudoku: which seed it came from and which transformations were applied. The same id always recreates the same sudoku.
+**Sudoku id**: The identifier of one specific sudoku: which seed it came from and which transformations were applied, written as 11 characters like `DHS6-RJN0-C38` (the last is a check character). The same id always recreates the same sudoku.
+
+**Seed id**: The stable number of a seed, `difficulty * 64 + position`; part of the sudoku id and never reused or changed.
 
 **Band**: One of the three horizontal groups of three rows.
 

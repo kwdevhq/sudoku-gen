@@ -98,39 +98,14 @@ public class SudokuGeneratorTests
     }
 
     [Test]
-    public async Task Generate_WithId_RecreatesTheSameSudoku()
+    public async Task FromId_RecreatesTheSameSudoku()
     {
         var original = SudokuGenerator.Generate(random: new Random(7));
 
-        var recreated = SudokuGenerator.Generate(id: SudokuId.Parse(original.Id.ToString()), random: new Random(999));
+        var recreated = SudokuGenerator.FromId(SudokuId.Parse(original.Id.ToString()));
 
         await Assert.That(recreated).IsEqualTo(original);
     }
-
-    [Test]
-    public async Task Generate_WithId_DoesNotConsumeRandomness()
-    {
-        var id = new SudokuId(3, 1, 10, 20, 30);
-        var rng = new Random(11);
-        var next = new Random(11).Next();
-
-        SudokuGenerator.Generate(id: id, random: rng);
-
-        await Assert.That(rng.Next()).IsEqualTo(next);
-    }
-
-    [Test]
-    public async Task Generate_WithIdAndMatchingDifficulty_Works()
-    {
-        var sudoku = SudokuGenerator.Generate(Difficulty.Easy, new SudokuId(0, 0, 0, 0, 0));
-
-        await Assert.That(sudoku.Difficulty).IsEqualTo(Difficulty.Easy);
-    }
-
-    [Test]
-    public async Task Generate_WithIdAndConflictingDifficulty_Throws() =>
-        await Assert.That(() => SudokuGenerator.Generate(Difficulty.Expert, new SudokuId(0, 0, 0, 0, 0)))
-            .Throws<ArgumentException>();
 
     [Test]
     public async Task Generate_ThrowsForUndefinedDifficulty() =>
@@ -138,27 +113,27 @@ public class SudokuGeneratorTests
             .Throws<ArgumentOutOfRangeException>();
 
     [Test]
-    public async Task Generate_IdentityId_OnlyRelabelsDigits()
+    public async Task FromId_IdentityId_OnlyRelabelsDigits()
     {
-        var sudoku = SudokuGenerator.Generate(id: new SudokuId(0, 0, 0, 0, 0));
+        var sudoku = SudokuGenerator.FromId(new SudokuId(0, 0, 0, 0, 0));
         var seed = Seeds.Easy[0];
 
         await Assert.That(sudoku.Solution).IsEqualTo(string.Concat(seed.Solution.Select(c => (char)('1' + (c - 'a')))));
     }
 
     [Test]
-    public async Task Generate_ExtremeIds_AreValidAndUnique()
+    public async Task FromId_ExtremeIds_AreValidAndUnique()
     {
         var corners = new[]
         {
-            new SudokuId(Seeds.Total - 1, 3, SudokuId.LineArrangementCount - 1, SudokuId.LineArrangementCount - 1, SudokuId.DigitArrangementCount - 1),
+            new SudokuId(Seeds.Expert[^1].Id, 3, SudokuId.LineArrangementCount - 1, SudokuId.LineArrangementCount - 1, SudokuId.DigitArrangementCount - 1),
             new SudokuId(0, 1, SudokuId.LineArrangementCount - 1, 0, 0),
             new SudokuId(0, 2, 0, SudokuId.LineArrangementCount - 1, SudokuId.DigitArrangementCount - 1),
         };
 
         foreach (var id in corners)
         {
-            var sudoku = SudokuGenerator.Generate(id: id);
+            var sudoku = SudokuGenerator.FromId(id);
 
             await Assert.That(SudokuChecks.IsValidSolution(sudoku.Solution)).IsTrue();
             await Assert.That(SudokuChecks.CountSolutions(sudoku.Puzzle, limit: 2)).IsEqualTo(1);

@@ -7,11 +7,19 @@ return SudokuCli.Run(args, Console.Out, Console.Error);
 internal static class SudokuCli
 {
     private const string Usage = """
-        Usage: sudoku-gen [options]
+        Usage:
+          sudoku-gen [-d <difficulty>] [--random-seed <int>] [options]   Generate a new sudoku
+          sudoku-gen --id <id> [options]                                 Recreate the sudoku with this id
 
+        Generate:
           -d, --difficulty <easy|medium|hard|expert>   Difficulty (default: any)
-              --id <id>                                Recreate the sudoku with this id (e.g. 12-3-457-1022-203456)
               --random-seed <int>                      Seed the random generator for reproducible runs
+
+        Recreate:
+              --id <id>                                Id of the sudoku, e.g. DHS6-RJN0-C38 (case and hyphens are ignored);
+                                                       cannot be combined with --difficulty or --random-seed
+
+        Options:
               --solution                               Also output the solution (text format)
           -f, --format <text|json>                     Output format (default: text)
           -h, --help                                   Show this help
@@ -44,12 +52,20 @@ internal static class SudokuCli
                     difficulty = parsed;
                     break;
                 case "--id":
-                    if (i + 1 >= args.Length || !SudokuId.TryParse(args[++i], out var parsedId))
+                    if (i + 1 >= args.Length)
                     {
-                        return Fail(error, "Invalid id, expected seed-rotation-rows-columns-digits");
+                        return Fail(error, "Missing value for --id");
                     }
 
-                    id = parsedId;
+                    try
+                    {
+                        id = SudokuId.Parse(args[++i]);
+                    }
+                    catch (FormatException ex)
+                    {
+                        return Fail(error, ex.Message);
+                    }
+
                     break;
                 case "--random-seed":
                     if (i + 1 >= args.Length || !int.TryParse(args[++i], out var value))
@@ -73,13 +89,18 @@ internal static class SudokuCli
         }
 
         Sudoku sudoku;
-        try
+        if (id is { } given)
         {
-            sudoku = SudokuGenerator.Generate(difficulty, id, randomSeed is { } s ? new Random(s) : null);
+            if (difficulty is not null || randomSeed is not null)
+            {
+                return Fail(error, "--id cannot be combined with --difficulty or --random-seed");
+            }
+
+            sudoku = SudokuGenerator.FromId(given);
         }
-        catch (ArgumentException ex)
+        else
         {
-            return Fail(error, ex.Message);
+            sudoku = SudokuGenerator.Generate(difficulty, randomSeed is { } s ? new Random(s) : null);
         }
 
         if (format == "json")

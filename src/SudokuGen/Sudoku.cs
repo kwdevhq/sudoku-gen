@@ -6,5 +6,5 @@ namespace SudokuGen;
 /// </param>
 /// <param name="Solution">81 characters in row-major order with every cell filled (<c>1</c>-<c>9</c>).</param>
 /// <param name="Difficulty">The difficulty of the puzzle.</param>
-/// <param name="Id">Identifier that recreates exactly this sudoku via <see cref="SudokuGenerator.Generate"/>.</param>
+/// <param name="Id">Identifier that recreates exactly this sudoku via <see cref="SudokuGenerator.FromId"/>.</param>
 public sealed record Sudoku(string Puzzle, string Solution, Difficulty Difficulty, SudokuId Id);

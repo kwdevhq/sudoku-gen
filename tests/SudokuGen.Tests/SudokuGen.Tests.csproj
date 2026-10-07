@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SudokuGen\SudokuGen.csproj" />
+    <ProjectReference Include="..\..\samples\SudokuGen.Cli\SudokuGen.Cli.csproj" />
   </ItemGroup>
 
 </Project>

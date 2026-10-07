@@ -3,10 +3,10 @@
 Judgement calls for review. Mechanical rules (format, warnings, coverage) are enforced by CI, not listed here.
 
 - **Single source**: generation logic lives only in `src/SudokuGen`; samples and benchmarks consume it.
-- **Stable ids**: `SudokuId` text form and seed order are persisted ([ADR 0003](docs/adr/0003-reproduce-with-sudoku-id.md)). Reordering or removing seeds, or changing the encoding, is a breaking change; append new seeds at the end of a difficulty's array.
+- **Stable ids**: `SudokuId` text form and seed ids are persisted ([ADR 0003](docs/adr/0003-reproduce-with-sudoku-id.md)). Changing the encoding, or a seed's `Id`, or removing seeds, is a breaking change; append new seeds at the end of a difficulty's array with the next id of its block (`SeedTests` verify this).
 - **Tight**: library hot paths stay allocation-light (spans, `stackalloc`); back any performance claim with `benchmarks/`.
 - **Zero dependencies** in `src/SudokuGen`.
 - **Public API**: every public member has XML docs; new terms appear in GLOSSARY.md first.
 - **Tests**: verify behaviour through the public API; unique-solution checks use the independent solver in `tests/SudokuGen.Tests/SudokuChecks.cs`, never library code.
-- `src/SudokuGen/Seeds.Data.cs` is upstream seed data copied once from `seeds.constant.ts` and maintained by hand; only append seeds.
+- `src/SudokuGen/Seeds.Data.cs` is upstream seed data copied once from `seeds.constant.ts` and maintained by hand; `SeedPinTests` pins every seed's content, so an appended seed needs its id and hash added there.
 - Target frameworks only in `Directory.Build.props`; package versions only in `Directory.Packages.props`.

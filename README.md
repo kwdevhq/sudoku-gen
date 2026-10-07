@@ -13,8 +13,8 @@ Sudoku any = SudokuGenerator.Generate();
 Sudoku hard = SudokuGenerator.Generate(Difficulty.Hard);
 
 // Reproduce exactly the same sudoku later (no randomness involved)
-SudokuId id = SudokuId.Parse(any.Id.ToString());   // e.g. 12-3-457-1022-203456
-Sudoku again = SudokuGenerator.Generate(id: id);
+SudokuId id = SudokuId.Parse(any.Id.ToString());   // e.g. DHS6-RJN0-C38
+Sudoku again = SudokuGenerator.FromId(id);
 
 // Seeded Random only affects which new id is picked
 Sudoku picked = SudokuGenerator.Generate(Difficulty.Easy, random: new Random(42));
@@ -50,7 +50,7 @@ This repository is a playground: every sample (TUI, API, solver, ...) consumes t
 
 ```
 dotnet run --project samples/SudokuGen.Cli -- --difficulty hard --solution
-dotnet run --project samples/SudokuGen.Cli -- --id 12-3-457-1022-203456 --format json
+dotnet run --project samples/SudokuGen.Cli -- --id DHS6-RJN0-C38 --format json
 dotnet test --solution SudokuGen.slnx --coverage
 pwsh scripts/coverage-report.ps1   # visual per-line HTML report (coverage-report/index.html)
 pwsh scripts/check-coverage.ps1   # clean run that fails below 100% line/branch coverage (used by CI)

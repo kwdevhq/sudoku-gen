@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SudokuGen\SudokuGen.csproj" />
+    <InternalsVisibleTo Include="SudokuGen.Tests" />
   </ItemGroup>
 
 </Project>

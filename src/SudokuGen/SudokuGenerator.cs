@@ -10,52 +10,44 @@ public static class SudokuGenerator
     private const int Cells = Size * Size;
     private const int Box = 3;
 
-    /// <summary>Generates a sudoku.</summary>
-    /// <param name="difficulty">The desired difficulty, or <see langword="null"/> for any difficulty.</param>
-    /// <param name="id">
-    /// Recreates exactly the sudoku with this id; no randomness is used. When <see langword="null"/> a random id is chosen
-    /// (matching <paramref name="difficulty"/> if given).
+    /// <summary>Generates a random sudoku.</summary>
+    /// <param name="difficulty">
+    /// The desired difficulty, or <see langword="null"/> to let <paramref name="random"/> pick one (every difficulty equally likely).
+    /// The pick is made last: with the same <paramref name="random"/> state, passing the difficulty it would have picked gives the same sudoku.
     /// </param>
-    /// <param name="random">Randomness source for choosing an id; defaults to <see cref="Random.Shared"/>. Ignored when <paramref name="id"/> is given.</param>
+    /// <param name="random">Randomness source for choosing the id; defaults to <see cref="Random.Shared"/>.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="difficulty"/> is not a defined <see cref="Difficulty"/>.</exception>
-    /// <exception cref="ArgumentException"><paramref name="id"/> and <paramref name="difficulty"/> are both given but disagree.</exception>
-    public static Sudoku Generate(Difficulty? difficulty = null, SudokuId? id = null, Random? random = null)
+    public static Sudoku Generate(Difficulty? difficulty = null, Random? random = null)
     {
         if (difficulty is { } requested && !Enum.IsDefined(requested))
         {
             throw new ArgumentOutOfRangeException(nameof(difficulty), requested, "Unknown difficulty.");
         }
 
-        if (id is { } given)
-        {
-            if (difficulty is { } expected && given.Difficulty != expected)
-            {
-                throw new ArgumentException($"Sudoku id {given} is {given.Difficulty}, not {expected}.", nameof(id));
-            }
-
-            return Create(given);
-        }
-
-        return Create(RandomId(difficulty, random ?? Random.Shared));
+        return FromId(RandomId(difficulty, random ?? Random.Shared));
     }
+
+    /// <summary>Recreates exactly the sudoku with the given id; no randomness is involved.</summary>
+    /// <param name="id">The id of the sudoku.</param>
+    public static Sudoku FromId(SudokuId id) => Create(id);
 
     private static SudokuId RandomId(Difficulty? difficulty, Random random)
     {
-        var seed = difficulty is { } d
-            ? Seeds.Offset(d) + random.Next(Seeds.For(d).Length)
-            : random.Next(Seeds.Total);
+        // The draws that do not depend on the difficulty come first and the difficulty last, so a Random in the same state
+        // gives the same sudoku with or without an explicit difficulty, as long as that difficulty is the one it would pick.
+        var position = random.Next();
+        var rotation = random.Next(SudokuId.RotationCount);
+        var rows = random.Next(SudokuId.LineArrangementCount);
+        var columns = random.Next(SudokuId.LineArrangementCount);
+        var digits = random.Next(SudokuId.DigitArrangementCount);
+        var seeds = Seeds.For(difficulty ?? (Difficulty)random.Next(Seeds.DifficultyCount));
 
-        return new SudokuId(
-            seed,
-            random.Next(SudokuId.RotationCount),
-            random.Next(SudokuId.LineArrangementCount),
-            random.Next(SudokuId.LineArrangementCount),
-            random.Next(SudokuId.DigitArrangementCount));
+        return new SudokuId(seeds[(int)((long)position * seeds.Length / int.MaxValue)].Id, rotation, rows, columns, digits);
     }
 
     private static Sudoku Create(SudokuId id)
     {
-        var (seed, difficulty) = Seeds.At(id.Seed);
+        var (seed, difficulty) = Seeds.Find(id.Seed);
 
         Span<int> layout = stackalloc int[Cells];
         BuildLayout(layout, id);
