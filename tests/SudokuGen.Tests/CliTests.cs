@@ -2,7 +2,7 @@ namespace SudokuGen.Tests;
 
 public class CliTests
 {
-    private const string KnownId = "2ZKG-VH7J-46X";
+    private const string KnownId = KnownIds.Random42Hard;
 
     private static readonly string[] HelpArgs = ["--help"];
 

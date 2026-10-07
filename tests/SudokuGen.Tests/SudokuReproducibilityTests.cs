@@ -239,10 +239,10 @@ public class SudokuReproducibilityTests
         var hard = SudokuGenerator.Generate(Difficulty.Hard, new Random(42));
         var any = SudokuGenerator.Generate(random: new Random(42));
 
-        await Assert.That(hard.Id.ToString()).IsEqualTo("2ZKG-VH7J-46X");
-        await Assert.That(any.Id.ToString()).IsEqualTo("2ZKG-VH7J-26B");
+        await Assert.That(hard.Id.ToString()).IsEqualTo(KnownIds.Random42Hard);
+        await Assert.That(any.Id.ToString()).IsEqualTo(KnownIds.Random42Any);
         await Assert.That(any.Difficulty).IsEqualTo(Difficulty.Medium);
-        await Assert.That(SudokuGenerator.FromId(SudokuId.Parse("2ZKG-VH7J-46X"))).IsEqualTo(hard);
+        await Assert.That(SudokuGenerator.FromId(SudokuId.Parse(KnownIds.Random42Hard))).IsEqualTo(hard);
     }
 
     [Test]

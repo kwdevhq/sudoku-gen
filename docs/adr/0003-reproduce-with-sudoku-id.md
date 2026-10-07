@@ -5,6 +5,10 @@ status: accepted
 
 Two random components (choosing a seed, then choosing transformations) made `Random`-seeded output depend on implementation details of the generator. Instead a `SudokuId` records the seed and every transformation (rotation, row/column arrangement, digit relabelling), and `SudokuGenerator.FromId` uses no randomness; `Generate` only picks a new id from a `Random`. Consequence: the seed ids and id encoding are a persisted format and must stay stable.
 
+## Draw order
+
+`Generate` draws, in this order: a raw position (scaled to the chosen difficulty's seed count), rotation, rows, columns, digits, and last, only when no difficulty was requested, the difficulty. A seeded `Random` therefore yields the same transformations with or without an explicit difficulty, and `-d <the random pick>` reproduces the unconstrained run. Changing this order changes every seeded result.
+
 ## Encoding
 
 - Each seed has an explicit, never-reused `Id` in the seed data: `difficulty * 64 + position` (Easy 0-63, Medium 64-127, Hard 128-191, Expert 192-255). Appending seeds to one difficulty therefore cannot shift another's ids; tests verify the ids against the data.
