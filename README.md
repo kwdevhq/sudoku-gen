@@ -44,6 +44,7 @@ Each seed yields over 2.4 trillion distinct puzzles, and generation is a couple 
 | `src/core` | The reusable library (NuGet package `SudokuGen`) |
 | `src/tests/SudokuGen.Tests` | TUnit tests (with coverage), including unique-solution checks |
 | `src/samples/SudokuGen.Cli` | Minimal CLI playground |
+| `src/samples/SudokuGen.Tui` | Mouse and keyboard Sudoku game for the terminal (Terminal.Gui), with autosave and statistics |
 | `src/benchmarks/SudokuGen.Benchmarks` | BenchmarkDotNet benchmarks for generation |
 
 This repository is a playground: every sample (TUI, API, solver, ...) consumes the same library.
@@ -51,6 +52,7 @@ This repository is a playground: every sample (TUI, API, solver, ...) consumes t
 ```
 dotnet run --project src/samples/SudokuGen.Cli -- --difficulty hard --solution
 dotnet run --project src/samples/SudokuGen.Cli -- --id DHS6-RJN0-C38 --format json
+dotnet run --project src/samples/SudokuGen.Tui
 dotnet test --solution src/SudokuGen.slnx --coverage
 pwsh scripts/coverage-report.ps1   # visual per-line HTML report (coverage-report/index.html)
 pwsh scripts/check-coverage.ps1   # clean run that fails below 100% line/branch coverage (used by CI)
