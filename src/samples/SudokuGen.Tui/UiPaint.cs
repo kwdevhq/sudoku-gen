@@ -3,8 +3,12 @@ namespace SudokuGen.Tui;
 internal sealed partial class Ui
 {
     private const int PadWidth = 6;
-    private const int LargeMinWidth = 100;
-    private const int LargeMinHeight = 40;
+    private const int CellWidth = 6;
+    private const int CellHeight = 3;
+    private const int LayoutHeight = MinHeight;
+    private const int TitleRows = 5;
+    private const int BoardWidth = (Game.Size * CellWidth) + 2;
+    private const int TotalWidth = BoardWidth + PanelGap + PanelWidth;
     private const int PanelGap = 2;
     private const int PanelWidth = 22;
     private const string LicenseUrl = "https://github.com/kwdevhq/sudoku-gen/blob/main/LICENSE";
@@ -16,25 +20,12 @@ internal sealed partial class Ui
     private const int StatsWidth = 56;
     private const int StatsHeight = 11;
     private const int StartWidth = 40;
-    private const int StartHeight = 18;
-    private const int MenuWidth = 36;
+    private const int StartHeight = 23;
+    private const int MenuWidth = 40;
     private const int MenuHeight = 9;
     private const int FooterWidth = 39;
 
     private bool Fits => width >= MinWidth && height >= MinHeight;
-
-    /// <summary>Roomy terminals get a bigger board: wider and taller cells.</summary>
-    private bool Large => width >= LargeMinWidth && height >= LargeMinHeight;
-
-    private int CellWidth => Large ? 8 : 6;
-
-    private int CellHeight => Large ? 4 : 3;
-
-    private int LayoutHeight => Large ? LargeMinHeight : MinHeight;
-
-    private int BoardWidth => (Game.Size * CellWidth) + 2;
-
-    private int TotalWidth => BoardWidth + PanelGap + PanelWidth;
 
     private int OriginX => (width - TotalWidth) / 2;
 
@@ -189,7 +180,7 @@ internal sealed partial class Ui
     private List<Button> StartButtons()
     {
         var sx = (width - StartWidth) / 2;
-        var sy = (height - StartHeight) / 2;
+        var sy = ((height - StartHeight) / 2) + TitleRows;
         var buttons = new List<Button>();
         foreach (var difficulty in Difficulties)
         {
@@ -223,9 +214,9 @@ internal sealed partial class Ui
         var x = dx + ((MenuWidth - 20) / 2);
         return
         [
-            new Button(x, dy + 3, 20, Format.Center("Resume (Esc)", 20), Theme.ButtonOn, () => Screen = Screen.Playing),
-            new Button(x, dy + 5, 20, Format.Center("Main menu (M)", 20), Theme.ButtonStyle, GoToStart),
-            new Button(x, dy + 7, 20, Format.Center("Quit (Q)", 20), Theme.ButtonStyle, Quit),
+            new Button(x, dy + 3, 20, Format.Center("Resume", 20), Theme.ButtonOn, () => Screen = Screen.Playing),
+            new Button(x, dy + 5, 20, Format.Center("Main menu", 20), Theme.ButtonStyle, GoToStart),
+            new Button(x, dy + 7, 20, Format.Center("Quit game", 20), Theme.ButtonStyle, Quit),
         ];
     }
 
@@ -271,26 +262,26 @@ internal sealed partial class Ui
         }
 
         line = 0;
-        foreach (var text in Help)
+        foreach (var (key, meaning) in Help)
         {
-            Text(canvas, px, py + 22 + line++, text, Theme.Muted);
+            Text(canvas, px, py + 22 + line, key, Theme.Normal);
+            Text(canvas, px + 9, py + 22 + line++, meaning, Theme.Muted);
         }
 
         PaintButtons(canvas, PlayingButtons());
         PaintFooter(canvas, OriginX);
     }
 
-    private static readonly string[] Help =
+    private static readonly (string Key, string Meaning)[] Help =
     [
-        "Arrows / click: select",
-        "1-9 enter  0/Del erase",
-        "Ctrl+Z/Y undo / redo",
-        "C check  T theme",
-        "Ctrl+C copy id",
-        "R reset  N new  Q quit",
-        "Esc game menu",
+        ("Arrows", "select"),
+        ("1-9", "enter digit"),
+        ("0 Del", "erase"),
+        ("C", "check"),
+        ("Ctrl+Z/Y", "undo / redo"),
+        ("T", "theme"),
+        ("Esc", "menu"),
     ];
-
     private void PaintCell(ICanvas canvas, Game game, int cell, Style style)
     {
         var (cx, cy) = CellOrigin(cell);
@@ -359,11 +350,27 @@ internal sealed partial class Ui
         return new Style(foreground, background);
     }
 
+    private static readonly string[][] Letters =
+    [
+        ["█████", "█    ", "█████", "    █", "█████"],
+        ["█   █", "█   █", "█   █", "█   █", "█████"],
+        ["████ ", "█   █", "█   █", "█   █", "████ "],
+        ["█████", "█   █", "█   █", "█   █", "█████"],
+        ["█   █", "█  █ ", "███  ", "█  █ ", "█   █"],
+        ["█   █", "█   █", "█   █", "█   █", "█████"],
+    ];
+
+    private static string BigTitle(int row) => string.Join(' ', Letters.Select(letter => letter[row]));
+
     private void PaintStart(ICanvas canvas)
     {
         var sx = (width - StartWidth) / 2;
-        var sy = (height - StartHeight) / 2;
-        Text(canvas, sx, sy, Format.Center("S U D O K U", StartWidth), Theme.Title);
+        var sy = ((height - StartHeight) / 2) + TitleRows;
+        for (var row = 0; row < TitleRows; row++)
+        {
+            Text(canvas, sx, sy - TitleRows + row, Format.Center(BigTitle(row), StartWidth), Theme.Title);
+        }
+
         Text(canvas, sx, sy + 1, Format.Center("Choose a difficulty", StartWidth), Theme.Muted);
         Text(canvas, sx, sy + 8, Format.Center("Sudoku id (optional, Ctrl+V pastes)", StartWidth), Theme.Muted);
         Text(canvas, sx, sy + 11, Format.Center(startError ?? string.Empty, StartWidth), Theme.Error);
@@ -404,6 +411,10 @@ internal sealed partial class Ui
         var (dx, dy) = Dialog(MenuWidth, MenuHeight);
         Text(canvas, dx + 1, dy + 1, Format.Center("Game menu", MenuWidth - 2), Theme.DialogTitle);
         PaintButtons(canvas, MenuButtons());
+        var (hx, hy) = (dx + ((MenuWidth - 20) / 2) + 22, dy + 3);
+        Text(canvas, hx, hy, "Esc", Theme.Dialog);
+        Text(canvas, hx, hy + 2, "M", Theme.Dialog);
+        Text(canvas, hx, hy + 4, "Q", Theme.Dialog);
     }
 
     private void PaintWon(ICanvas canvas)

@@ -138,7 +138,7 @@ public class UiExtrasTests
     {
         using var f = new UiFixture(startGame: false);
         var screen = f.Paint();
-        var (x, y) = screen.Find("S U D O K U");
+        var (x, y) = screen.Find("█████ █   █ ████  █████ █   █ █   █");
         await Assert.That(screen.StyleAt(x, y).Fg).IsEqualTo(Theme.Brand);
 
         f.ClickLabel("kw.dev");

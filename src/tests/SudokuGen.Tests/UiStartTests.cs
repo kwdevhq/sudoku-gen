@@ -12,7 +12,7 @@ public class UiStartTests
         var screen = f.Paint();
 
         await Assert.That(f.Ui.Screen).IsEqualTo(Screen.Start);
-        await Assert.That(screen.Contains("S U D O K U")).IsTrue();
+        await Assert.That(screen.Contains("█████ █   █ ████  █████ █   █ █   █")).IsTrue();
         await Assert.That(screen.Contains("● Medium")).IsTrue();
         await Assert.That(screen.Contains("○ Easy")).IsTrue();
         await Assert.That(screen.Contains("Esc quit")).IsTrue();

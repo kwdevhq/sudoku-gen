@@ -7,4 +7,4 @@
 - Build, test and benchmark commands: [README.md](README.md). `dotnet test` needs `--solution src/SudokuGen.slnx`.
 - CI (`.github/workflows/pr.yml`) enforces format, warnings-as-errors and 100% coverage via `scripts/check-coverage.ps1` (clean test run, then verifies every coverage report). `pwsh scripts/check.ps1` runs all of it; run it before committing, or enable the hook once with `git config core.hooksPath .githooks`.
 - The aihero.dev skills are installed globally, not vendored. Reach for `grilling` to settle design, `tdd` to implement, `domain-modeling` for glossary and ADRs, `diagnosing-bugs` for failures.
-- Copyright holder is "kw.dev GmbH", never a personal name; keep upstream attribution in LICENSE and NOTICE.md.
+- Copyright holder is "kw.dev gmbh", never a personal name; keep upstream attribution in LICENSE and NOTICE.md.
